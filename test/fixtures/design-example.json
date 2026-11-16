@@ -1,0 +1,57 @@
+{
+  "targets": [
+    {
+      "dataSource": "<議事録 DB のデータソース ID>",
+      "type": {
+        "properties": {
+          "日付": { "type": "date", "required": true },
+          "参加者": { "type": "people", "min": 1 },
+          "種別": { "type": "select", "options": ["定例", "臨時"] },
+          "チケット": { "type": "rich_text", "pattern": "^[A-Z]+-\\d+$", "optional": true }
+        },
+        "body": [
+          { "heading": 2, "title": "目的" },
+          { "heading": 2, "title": "決定事項", "children": [{ "block": "list", "min": 1 }] },
+          { "heading": 2, "title": "TODO", "children": [{ "block": "to_do" }] },
+          { "heading": 2, "title": "メモ", "optional": true }
+        ],
+        "headings": { "noSkipLevel": true, "allowExtra": true },
+        "text": { "textlint": { "presets": ["ja-technical-writing"], "prh": ["./prh.yml"] } }
+      }
+    },
+    {
+      "dataSource": "<設計書 DB>",
+      "where": { "状態": "確定" },
+      "type": {
+        "fromTemplate": { "page": "<テンプレートページ ID>" },
+        "properties": {
+          "状態": { "type": "status", "options": ["下書き", "レビュー中", "確定"] }
+        }
+      }
+    },
+    {
+      "page": "<単体ページ ID>",
+      "type": {
+        "fromTemplate": { "page": "<テンプレートページ ID>" },
+        "properties": {
+          "状態": { "type": "status", "options": ["下書き", "レビュー中", "確定"] }
+        }
+      }
+    }
+  ],
+  "type": {
+    "body": [
+      { "heading": 1, "title": "概要" },
+      { "heading": 1, "title": "要件" },
+      { "heading": 1, "title": "設計" }
+    ],
+    "numbering": {
+      "format": { "h1": "{n}. {title}", "h2": "{n}.{n} {title}", "h3": "{n}.{n}.{n} {title}" },
+      "sequential": true
+    },
+    "references": {
+      "patterns": ["{n}章", "{n}節", "{n}「{title}」", "「{title}」を参照"],
+      "notionLinks": true
+    }
+  }
+}

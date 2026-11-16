@@ -1,0 +1,261 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "notion-lint result",
+  "description": "notion-lint check --format json の出力",
+  "type": "object",
+  "anyOf": [
+    {
+      "required": [
+        "summary"
+      ]
+    },
+    {
+      "required": [
+        "error"
+      ]
+    }
+  ],
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "summary"
+        ]
+      },
+      "then": {
+        "additionalProperties": false,
+        "description": "検査の結果 (終了コード 0 または 1)",
+        "type": "object",
+        "required": [
+          "ok",
+          "summary",
+          "pages"
+        ],
+        "properties": {
+          "ok": {
+            "description": "違反が 1 つもなければ true (終了コード 0)",
+            "type": "boolean"
+          },
+          "summary": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "pages",
+              "violations",
+              "errors",
+              "warnings"
+            ],
+            "properties": {
+              "pages": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "violations": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "errors": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "warnings": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            }
+          },
+          "pages": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "pageId",
+                "url",
+                "violations"
+              ],
+              "properties": {
+                "pageId": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "typeName": {
+                  "description": "当てた型の name",
+                  "type": "string"
+                },
+                "violations": {
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "pageId",
+                      "blockId",
+                      "path",
+                      "rule",
+                      "severity",
+                      "message",
+                      "suggestions"
+                    ],
+                    "properties": {
+                      "pageId": {
+                        "description": "ページ ID",
+                        "type": "string"
+                      },
+                      "blockId": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "description": "ブロック ID。プロパティの違反や、ブロックがないことの違反では null"
+                      },
+                      "path": {
+                        "description": "型のどこに対応するか (例: body[1]、body[1].children[0]、properties.参加者)",
+                        "type": "string"
+                      },
+                      "rule": {
+                        "description": "違反の種類 (例: property.min、body.missing、body.order、numbering.sequence、textlint/<ルール名>)",
+                        "type": "string"
+                      },
+                      "severity": {
+                        "description": "error は型に合わない。warning は textlint の指摘など",
+                        "type": "string",
+                        "enum": [
+                          "error",
+                          "warning"
+                        ]
+                      },
+                      "message": {
+                        "type": "string"
+                      },
+                      "suggestions": {
+                        "type": "array",
+                        "items": {
+                          "additionalProperties": false,
+                          "description": "直し方の候補",
+                          "type": "object",
+                          "required": [
+                            "message"
+                          ],
+                          "properties": {
+                            "message": {
+                              "description": "直し方の説明 (例: 「2.1 は『目的』です。『背景』は 2.2 です」)",
+                              "type": "string"
+                            },
+                            "replacement": {
+                              "description": "置き換える文字列が決まるときはその文字列",
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "url": {
+                        "description": "違反箇所への Notion のリンク",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "error"
+        ]
+      },
+      "then": {
+        "additionalProperties": false,
+        "description": "設定エラーや API エラー (終了コード 2)",
+        "type": "object",
+        "required": [
+          "ok",
+          "error"
+        ],
+        "properties": {
+          "ok": {
+            "const": false,
+            "type": "boolean"
+          },
+          "error": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "kind",
+              "message"
+            ],
+            "properties": {
+              "kind": {
+                "description": "usage: 引数の誤り、config: 設定の読み込みや Schema の不一致、api: Notion API のエラー、internal: その他",
+                "type": "string",
+                "enum": [
+                  "usage",
+                  "config",
+                  "api",
+                  "internal"
+                ]
+              },
+              "code": {
+                "description": "細かい種類 (例: not_implemented)",
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "source": {
+                "description": "設定の出どころ (ファイルのパス、stdin、--config-json)",
+                "type": "string"
+              },
+              "issues": {
+                "description": "Schema に合わなかった項目",
+                "type": "array",
+                "items": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "path",
+                    "pointer",
+                    "keyword",
+                    "message"
+                  ],
+                  "properties": {
+                    "path": {
+                      "description": "読みやすい位置 (例: type.body[1].heading)。ルートは空文字",
+                      "type": "string"
+                    },
+                    "pointer": {
+                      "description": "JSON Pointer (例: /type/body/1/heading)",
+                      "type": "string"
+                    },
+                    "keyword": {
+                      "description": "合わなかった JSON Schema のキーワード",
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "params": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^(.*)$": {}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
