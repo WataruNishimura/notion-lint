@@ -13,6 +13,7 @@ import type {
   Violation,
 } from "../schema/result.js";
 import { checkPage, type Finding, needsBody, skippedParts } from "../validate/index.js";
+import { checkOutsideLinks, type LinkCache } from "./links.js";
 import { skeletonFromTemplate, withTemplateBody } from "../validate/template.js";
 
 /**
@@ -96,6 +97,7 @@ export async function runCheck(plans: Plan[], fetcher: PageFetcher): Promise<Che
   const results: PageResult[] = [];
   const notes = new Map<string, Note>();
   const templates = new Map<string, Promise<BodyItem[]>>();
+  const linkTargets: LinkCache = new Map();
 
   for (const rawPlan of plans) {
     const plan = { ...rawPlan, type: await resolveTemplate(rawPlan, fetcher, templates) };
@@ -110,7 +112,9 @@ export async function runCheck(plans: Plan[], fetcher: PageFetcher): Promise<Che
       const id = typeof raw.id === "string" ? raw.id : "";
       const blocks = needsBody(plan.type) ? await fetcher.blocks(id) : [];
       const page = normalizePage(raw, blocks);
-      results.push(pageResult(page, plan.type, checkPage(page, plan.type)));
+      const findings = checkPage(page, plan.type);
+      findings.push(...(await checkOutsideLinks(page, plan.type, fetcher, linkTargets)));
+      results.push(pageResult(page, plan.type, findings));
     }
   }
 

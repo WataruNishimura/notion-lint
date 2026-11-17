@@ -1,5 +1,6 @@
 import type { RawBlockTree } from "../notion/fetch.js";
-import type { BodyItem, HeadingItem, PageModel, PropertyValue } from "./model.js";
+import { parseNotionId } from "../notion/id.js";
+import type { BodyItem, HeadingItem, NotionLink, PageModel, PropertyValue } from "./model.js";
 
 /**
  * Convert Notion API JSON (API version 2025-09-03) into the internal representation.
@@ -95,17 +96,91 @@ function flatten(trees: RawBlockTree[]): BodyItem[] {
     }
     const id = str(tree.block.id) ?? "";
     const content = record(tree.block[type]);
-    const text = plainText(content.rich_text).trim();
     const children = normalizeBlocks(tree.children);
     const level = /^heading_(\d)$/.exec(type)?.[1];
     if (level !== undefined) {
+      const text = plainText(content.rich_text).trim();
       // A toggle heading's own children come first in its section.
       out.push({ kind: "heading", id, level: Number(level), text, children });
-    } else {
-      out.push({ kind: "block", id, type, text, children });
+      continue;
     }
+    // A table row has cells (one rich text array each) instead of rich_text.
+    const texts = type === "table_row" ? array(content.cells) : [content.rich_text];
+    const text = texts
+      .map((richText) => plainText(richText).trim())
+      .join("\n")
+      .trim();
+    const links = texts.flatMap(notionLinks);
+    if (type === "link_to_page") {
+      const target = str(content.page_id) ?? str(content.database_id);
+      const pageId = target === null ? undefined : parseNotionId(target);
+      if (pageId !== undefined) links.push({ kind: "block", text: "", pageId, blockId: null });
+    }
+    out.push({ kind: "block", id, type, text, children, ...(links.length > 0 ? { links } : {}) });
   }
   return out;
+}
+
+/**
+ * Links to Notion pages and blocks in a rich text array. Neighbouring items with the same
+ * URL are one link that Notion split because of formatting (e.g. a bold word in it).
+ */
+export function notionLinks(richText: unknown): NotionLink[] {
+  const links: NotionLink[] = [];
+  let previousUrl: string | null = null;
+  for (const raw of array(richText)) {
+    const item = record(raw);
+    const text = str(item.plain_text) ?? "";
+    if (item.type === "mention") {
+      previousUrl = null;
+      const mention = record(item.mention);
+      const target = str(record(mention[str(mention.type) ?? ""]).id);
+      if (mention.type !== "page" && mention.type !== "database") continue;
+      const pageId = target === null ? undefined : parseNotionId(target);
+      if (pageId === undefined) continue;
+      const blockId = notionTarget(str(item.href) ?? "")?.blockId ?? null;
+      links.push({ kind: "mention", text, pageId, blockId });
+      continue;
+    }
+    const url = str(record(record(item.text).link).url) ?? str(item.href);
+    const target = url === null ? undefined : notionTarget(url);
+    if (target === undefined) {
+      previousUrl = null;
+      continue;
+    }
+    const last = links.at(-1);
+    if (url === previousUrl && last !== undefined) {
+      last.text += text;
+    } else {
+      links.push({ kind: "link", text, ...target });
+    }
+    previousUrl = url;
+  }
+  return links;
+}
+
+const NOTION_HOSTS = /(^|\.)notion\.(so|site|com)$/i;
+
+/**
+ * The page and block a Notion URL points to: `https://www.notion.so/Title-<page id>#<block id>`,
+ * or the relative form the API uses for links inside a workspace (`/<page id>#<block id>`).
+ * Undefined for other URLs.
+ */
+export function notionTarget(
+  url: string,
+): { pageId: string; blockId: string | null } | undefined {
+  let parsed: URL;
+  try {
+    parsed = new URL(url, "https://www.notion.so");
+  } catch {
+    return undefined;
+  }
+  if (!/^https?:$/.test(parsed.protocol) || !NOTION_HOSTS.test(parsed.hostname)) return undefined;
+  const pageId = parseNotionId(`https://www.notion.so${parsed.pathname}${parsed.search}`);
+  if (pageId === undefined) return undefined;
+  const fragment = parsed.hash.slice(1);
+  const blockId = /^[0-9a-f-]{32,36}$/i.test(fragment) ? (parseNotionId(fragment) ?? null) : null;
+  return { pageId, blockId };
 }
 
 function sectionize(flat: BodyItem[]): BodyItem[] {

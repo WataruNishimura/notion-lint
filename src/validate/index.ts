@@ -4,15 +4,24 @@ import type { DocType } from "../schema/config.js";
 import type { Note } from "../schema/result.js";
 import { checkBody } from "./body.js";
 import type { Finding } from "./finding.js";
+import { checkNumbering } from "./numbering.js";
 import { checkProperties } from "./properties.js";
+import { checkReferences } from "./references.js";
 
 export type { Finding } from "./finding.js";
 
-/** Match one normalized page against a type. Properties first, then the body. */
+/**
+ * Match one normalized page against a type. Properties first, then the body, section
+ * numbers, and references. Links to other pages are checked in `check` (they need the API).
+ */
 export function checkPage(page: PageModel, type: DocType): Finding[] {
   return [
     ...checkProperties(type.properties ?? {}, page.properties),
     ...checkBody(type.body, page.body, type.headings, type.numbering),
+    ...(type.numbering === undefined ? [] : checkNumbering(type.numbering, page.body)),
+    ...(type.references === undefined
+      ? []
+      : checkReferences(type.references, type.numbering, page)),
   ];
 }
 
@@ -21,7 +30,9 @@ export function needsBody(type: DocType): boolean {
   return (
     type.body !== undefined ||
     type.fromTemplate !== undefined ||
-    type.headings?.noSkipLevel === true
+    type.headings?.noSkipLevel === true ||
+    type.numbering !== undefined ||
+    type.references !== undefined
   );
 }
 
@@ -40,8 +51,6 @@ export function skippedParts(type: DocType, typePath: string): Note[] {
       message: `${what} is not checked yet in this version (skipped)`,
     });
   };
-  skip("numbering", "numbering (section numbers)");
-  skip("references", "references (section references)");
   skip("text", "text (textlint)");
   return notes;
 }

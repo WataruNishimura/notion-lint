@@ -169,8 +169,6 @@ describe("notion-lint check", () => {
   it("skips parts of a type that are not implemented yet, with a note", async () => {
     const type = {
       body: [{ heading: 2, title: "目的" }],
-      numbering: { format: { h2: "{n}. {title}" } },
-      references: { patterns: ["see section {n}"] },
       text: { textlint: { presets: ["ja-technical-writing"] } },
     };
     const result = await checkCli(["--page", pageOk, "--format", "json"], {
@@ -178,15 +176,11 @@ describe("notion-lint check", () => {
     });
     expect(result.code).toBe(0);
     expect(parseResult(result.stdout).notes).toEqual([
-      expect.objectContaining({ rule: "skipped", path: "type.numbering" }),
-      expect.objectContaining({ rule: "skipped", path: "type.references" }),
       expect.objectContaining({ rule: "skipped", path: "type.text" }),
     ]);
 
     const text = await checkCli(["--page", pageOk], { config: JSON.stringify({ type }) });
-    expect(text.stdout).toContain(
-      "ℹ type.numbering  numbering (section numbers) is not checked yet",
-    );
+    expect(text.stdout).toContain("ℹ type.text  text (textlint) is not checked yet");
   });
 
   it("does not fetch blocks when the type has no body rules", async () => {

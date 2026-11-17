@@ -19,6 +19,8 @@ export interface PageFetcher {
   dataSourcePages(dataSourceId: string): Promise<Record<string, unknown>[]>;
   /** The page's blocks, with children fetched recursively. */
   blocks(pageId: string): Promise<RawBlockTree[]>;
+  /** One block without its children. A page or database ID returns its `child_page` / `child_database` block. */
+  block(blockId: string): Promise<Record<string, unknown>>;
 }
 
 /** A Notion API failure that is not retried (or ran out of retries). Never contains the token. */
@@ -98,6 +100,13 @@ export class NotionFetcher implements PageFetcher {
 
   async blocks(pageId: string): Promise<RawBlockTree[]> {
     return this.#children(pageId);
+  }
+
+  async block(blockId: string): Promise<Record<string, unknown>> {
+    const block = await this.#request(`block ${blockId}`, () =>
+      this.#api.retrieveBlock({ block_id: blockId }),
+    );
+    return asRecord(block);
   }
 
   async #children(blockId: string): Promise<RawBlockTree[]> {

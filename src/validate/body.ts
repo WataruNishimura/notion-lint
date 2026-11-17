@@ -10,6 +10,7 @@ import type {
 } from "../schema/config.js";
 import type { Regex } from "../schema/helpers.js";
 import type { Finding } from "./finding.js";
+import { headingFormats } from "./numbering.js";
 
 /**
  * Match the type's `body` skeleton against the page's heading tree.
@@ -209,22 +210,14 @@ function describeTitle(title: string | Regex): string {
 /**
  * The heading text that skeleton titles are compared with. When the type has `numbering`,
  * a section number written in the heading's format is removed first ("1.2 Background" ->
- * "Background"). Checking the numbers themselves is not implemented yet.
+ * "Background"). The numbers themselves are checked by `numbering.ts`.
  */
 export function titleReader(
   numbering: NumberingRule | undefined,
 ): (heading: HeadingItem) => string {
-  const formats = new Map<number, RegExp>();
-  for (const [key, format] of Object.entries(numbering?.format ?? {})) {
-    if (format === undefined) continue;
-    const escaped = format.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const source = escaped.replace(/\\\{n\\\}/g, "\\d+").replace(/\\\{title\\\}/, "(?<title>.+)");
-    formats.set(Number(key.slice(1)), new RegExp(`^${source}$`, "u"));
-  }
-  return (heading) => {
-    const title = formats.get(heading.level)?.exec(heading.text)?.groups?.title;
-    return (title ?? heading.text).trim();
-  };
+  const formats = headingFormats(numbering);
+  return (heading) =>
+    (formats.get(heading.level)?.parse(heading.text)?.title ?? heading.text).trim();
 }
 
 // ---------------------------------------------------------------------------
