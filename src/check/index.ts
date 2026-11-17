@@ -1,5 +1,5 @@
 import { normalizePage } from "../normalize/index.js";
-import type { PageModel, PropertyValue } from "../normalize/model.js";
+import type { BodyItem, PageModel, PropertyValue } from "../normalize/model.js";
 import { NotionApiError, type PageFetcher } from "../notion/fetch.js";
 import { parseNotionId } from "../notion/id.js";
 import { joinPath } from "../path.js";
@@ -14,6 +14,7 @@ import type {
 } from "../schema/result.js";
 import { type PreparedTextlint, prepareTextlint, TextlintSetupError } from "../text/textlint.js";
 import { checkPage, type Finding, needsBody, skippedParts } from "../validate/index.js";
+import { skeletonFromTemplate, withTemplateBody } from "../validate/template.js";
 
 /**
  * `check`: decide which pages to check, fetch them, normalize, match against their types,
@@ -106,8 +107,10 @@ export async function runCheck(
   const notes = new Map<string, Note>();
   // Load textlint first: a missing preset or dictionary is a config error before any request.
   const textlints = plans.map((plan) => loadTextlint(plan, options.baseDir ?? process.cwd()));
+  const templates = new Map<string, Promise<BodyItem[]>>();
 
-  for (const [planIndex, plan] of plans.entries()) {
+  for (const [planIndex, rawPlan] of plans.entries()) {
+    const plan = { ...rawPlan, type: await resolveTemplate(rawPlan, fetcher, templates) };
     for (const note of skippedParts(plan.type, plan.typePath)) notes.set(note.path, note);
     const rawPages =
       plan.kind === "page"
@@ -161,6 +164,47 @@ async function textFindings(textlint: PreparedTextlint, page: PageModel): Promis
     suggestions: found.suggestions,
     blockId: found.blockId,
   }));
+}
+
+/**
+ * Apply `fromTemplate`: fetch the template page (once per run, however many targets use it)
+ * and make its headings the type's `body`. A `body` written in the type wins, so the template
+ * is not fetched then. A template that cannot be fetched is an API error.
+ */
+async function resolveTemplate(
+  plan: Plan,
+  fetcher: PageFetcher,
+  cache: Map<string, Promise<BodyItem[]>>,
+): Promise<DocType> {
+  const { type, typePath } = plan;
+  if (type.fromTemplate === undefined || type.body !== undefined) return type;
+  const pageId = parseNotionId(type.fromTemplate.page);
+  if (pageId === undefined) {
+    throw new CheckError(
+      "config",
+      `${joinPath(typePath, "fromTemplate.page")} is not a Notion page URL or ID: ${type.fromTemplate.page}`,
+    );
+  }
+  let items = cache.get(pageId);
+  if (items === undefined) {
+    items = (async () => {
+      try {
+        const raw = await fetcher.page(pageId);
+        return normalizePage(raw, await fetcher.blocks(pageId)).body;
+      } catch (error) {
+        if (error instanceof NotionApiError) {
+          throw new NotionApiError(
+            `${joinPath(typePath, "fromTemplate")}: cannot read the template page ${pageId}: ${error.message}`,
+            error.status,
+            error.code,
+          );
+        }
+        throw error;
+      }
+    })();
+    cache.set(pageId, items);
+  }
+  return withTemplateBody(type, skeletonFromTemplate(await items, type.numbering));
 }
 
 /** Link to a block on a page: the page URL with the block ID (without hyphens) as the fragment. */

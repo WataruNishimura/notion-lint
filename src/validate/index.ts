@@ -20,6 +20,7 @@ export function checkPage(page: PageModel, type: DocType): Finding[] {
 export function needsBody(type: DocType): boolean {
   return (
     type.body !== undefined ||
+    type.fromTemplate !== undefined ||
     type.headings?.noSkipLevel === true ||
     type.text?.textlint !== undefined
   );
@@ -42,15 +43,5 @@ export function skippedParts(type: DocType, typePath: string): Note[] {
   };
   skip("numbering", "numbering (section numbers)");
   skip("references", "references (section references)");
-  if (type.fromTemplate !== undefined) {
-    notes.push({
-      rule: "skipped",
-      path: joinPath(typePath, "fromTemplate"),
-      message:
-        type.body === undefined
-          ? "fromTemplate is not supported yet; the body is not checked for this type (skipped)"
-          : "fromTemplate is not supported yet; only the body written in the type is checked (skipped)",
-    });
-  }
   return notes;
 }
