@@ -4,7 +4,7 @@ A CLI that checks whether Notion pages match the document "types" written in `no
 
 See [docs/design.md](docs/design.md) for the design.
 
-> Currently implemented: loading and validating the config, the `schema` / `print-config` / `agent` commands, and `check` with property and body (heading tree) matching. `doc.fromTemplate` (the body skeleton is built from a template page's headings). Section numbers and references (`numbering`, `references`) and textlint (`text`) are not checked yet: `check` skips them and reports an info note (see below).
+> Currently implemented: loading and validating the config, the `schema` / `print-config` / `agent` commands, and `check` with property and body (heading tree) matching. `doc.fromTemplate` (the body skeleton is built from a template page's headings). Section numbers and references (`numbering`, `references`) are not checked yet: `check` skips them and reports an info note (see below).
 
 ## `notion-lint check`
 
@@ -28,6 +28,13 @@ notion-lint --format github        # GitHub Actions annotations
 - Requests are paced to about 3 per second. A 429 response is retried after its Retry-After delay, and 429 / 5xx responses are retried up to 5 times.
 - `--format json` prints the shape in [schema/result.schema.json](schema/result.schema.json) (`notion-lint schema result`): for each page, violations with `pageId`, `blockId`, `path` in the type (`properties.<name>`, `body[1]`, `body[1].children[0]`), `rule`, `severity`, `message`, `suggestions`, and a Notion `url`. `notes` lists parts of a type that were skipped (`rule: "skipped"`, `path` such as `targets[0].type.numbering`); notes do not change `ok` or the exit code.
 - A missing `NOTION_TOKEN` or a Notion API error exits with code 2 (`error.kind` is `api`). The token is never printed.
+
+Body text with textlint (`text.textlint`):
+
+- The body is converted to Markdown (headings, paragraphs, nested lists, to-dos, quotes, callouts; code, equations, tables and dividers are left out) and linted with the textlint kernel, with no shell command. Each message becomes a violation on its block: `blockId`, a `path` such as `body > <heading> > <sub-heading>` (`body` before the first heading), `rule` as textlint names it (`ja-technical-writing/ja-no-weak-phrase`, `prh`), and the message followed by the rule name. When textlint offers a fix, it is a suggestion with `replacement`.
+- `presets` are resolved as `textlint-rule-preset-<name>`, `rules` as `textlint-rule-<name>` (a `<preset>/<rule>` key changes or, with `false`, switches off a preset rule), and `prh` dictionary paths relative to the config file (the current directory for JSON from `--config-json` or standard input). Packages are looked up from the config file's directory first, then in notion-lint's own dependencies; `textlint`, `textlint-rule-preset-ja-technical-writing` and `textlint-rule-prh` are installed with notion-lint. A preset, rule or dictionary that cannot be found exits with code 2 before any page is fetched.
+- Severity: textlint findings are `warning` by default, as in the design example. A rule configured with `{ "severity": "error" }` reports `error`; textlint's `info` also maps to `warning`. Warnings still count as violations (exit code 1).
+- Only the plain text of each block is converted, so inline code and link markup are not seen by textlint.
 
 How the body is matched:
 

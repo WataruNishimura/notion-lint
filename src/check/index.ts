@@ -12,6 +12,7 @@ import type {
   PageResult,
   Violation,
 } from "../schema/result.js";
+import { type PreparedTextlint, prepareTextlint, TextlintSetupError } from "../text/textlint.js";
 import { checkPage, type Finding, needsBody, skippedParts } from "../validate/index.js";
 import { skeletonFromTemplate, withTemplateBody } from "../validate/template.js";
 
@@ -92,12 +93,23 @@ export function planCheck(config: Config, pages: string[]): Plan[] {
   });
 }
 
-export async function runCheck(plans: Plan[], fetcher: PageFetcher): Promise<CheckResult> {
+export interface CheckOptions {
+  /** Directory that textlint presets and prh paths resolve from: the config file's directory, or the current directory. */
+  baseDir?: string;
+}
+
+export async function runCheck(
+  plans: Plan[],
+  fetcher: PageFetcher,
+  options: CheckOptions = {},
+): Promise<CheckResult> {
   const results: PageResult[] = [];
   const notes = new Map<string, Note>();
+  // Load textlint first: a missing preset or dictionary is a config error before any request.
+  const textlints = plans.map((plan) => loadTextlint(plan, options.baseDir ?? process.cwd()));
   const templates = new Map<string, Promise<BodyItem[]>>();
 
-  for (const rawPlan of plans) {
+  for (const [planIndex, rawPlan] of plans.entries()) {
     const plan = { ...rawPlan, type: await resolveTemplate(rawPlan, fetcher, templates) };
     for (const note of skippedParts(plan.type, plan.typePath)) notes.set(note.path, note);
     const rawPages =
@@ -110,7 +122,10 @@ export async function runCheck(plans: Plan[], fetcher: PageFetcher): Promise<Che
       const id = typeof raw.id === "string" ? raw.id : "";
       const blocks = needsBody(plan.type) ? await fetcher.blocks(id) : [];
       const page = normalizePage(raw, blocks);
-      results.push(pageResult(page, plan.type, checkPage(page, plan.type)));
+      const findings = checkPage(page, plan.type);
+      const textlint = textlints[planIndex];
+      if (textlint !== undefined) findings.push(...(await textFindings(textlint, page)));
+      results.push(pageResult(page, plan.type, findings));
     }
   }
 
@@ -127,6 +142,28 @@ export async function runCheck(plans: Plan[], fetcher: PageFetcher): Promise<Che
     pages: results,
     notes: [...notes.values()],
   };
+}
+
+function loadTextlint(plan: Plan, baseDir: string): PreparedTextlint | undefined {
+  const rule = plan.type.text?.textlint;
+  if (rule === undefined) return undefined;
+  try {
+    return prepareTextlint(rule, baseDir, joinPath(joinPath(plan.typePath, "text"), "textlint"));
+  } catch (error) {
+    if (error instanceof TextlintSetupError) throw new CheckError("config", error.message);
+    throw error;
+  }
+}
+
+async function textFindings(textlint: PreparedTextlint, page: PageModel): Promise<Finding[]> {
+  return (await textlint.lintBody(page.body)).map((found) => ({
+    path: found.path,
+    rule: found.rule,
+    severity: found.severity,
+    message: found.message,
+    suggestions: found.suggestions,
+    blockId: found.blockId,
+  }));
 }
 
 /**
@@ -183,7 +220,7 @@ function pageResult(page: PageModel, type: DocType, findings: Finding[]): PageRe
       blockId: finding.blockId,
       path: finding.path,
       rule: finding.rule,
-      severity: "error",
+      severity: finding.severity ?? "error",
       message: finding.message,
       suggestions: finding.suggestions,
       url: linkTo === undefined || page.url === "" ? page.url : blockUrl(page.url, linkTo),

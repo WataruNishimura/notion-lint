@@ -21,7 +21,8 @@ export function needsBody(type: DocType): boolean {
   return (
     type.body !== undefined ||
     type.fromTemplate !== undefined ||
-    type.headings?.noSkipLevel === true
+    type.headings?.noSkipLevel === true ||
+    type.text?.textlint !== undefined
   );
 }
 
@@ -42,6 +43,5 @@ export function skippedParts(type: DocType, typePath: string): Note[] {
   };
   skip("numbering", "numbering (section numbers)");
   skip("references", "references (section references)");
-  skip("text", "text (textlint)");
   return notes;
 }

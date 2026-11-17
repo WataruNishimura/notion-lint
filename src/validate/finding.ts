@@ -1,4 +1,4 @@
-import type { Suggestion } from "../schema/result.js";
+import type { Severity, Suggestion } from "../schema/result.js";
 
 /**
  * One mismatch between a page and its type, before page-level details (page ID, URL,
@@ -8,6 +8,8 @@ export interface Finding {
   /** Where in the type: `properties.<name>`, `body[1]`, `body[1].children[0]`, `headings.noSkipLevel`. */
   path: string;
   rule: string;
+  /** Defaults to "error". textlint findings carry their own. */
+  severity?: Severity;
   message: string;
   suggestions: Suggestion[];
   /** The block the finding is about; null for properties and for missing blocks. */
