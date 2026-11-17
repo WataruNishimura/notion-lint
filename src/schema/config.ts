@@ -312,7 +312,7 @@ export const TemplateSource = Type.Object(
   {
     additionalProperties: false,
     description:
-      "Build body from a template page. body / properties written in the same type take precedence over those from the template",
+      "Build body from the headings of a template page (headings only, all required, nested as in the template). A body written in the same type replaces it (no merge). Other settings such as properties apply as written",
   },
 );
 export type TemplateSource = Static<typeof TemplateSource>;
