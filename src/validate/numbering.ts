@@ -50,7 +50,10 @@ export class HeadingFormat {
     return { parts, title: (groups.title ?? "").trim() };
   }
 
-  /** The number as the format writes it: "2.1" for "{n}.{n} {title}", "第2章" for "第{n}章 {title}". */
+  /**
+   * The number as the format writes it, from the first to the last `{n}`: "2.1" for
+   * "{n}.{n} {title}", "2-1" for "{n}-{n} {title}", "2" for "第{n}章 {title}".
+   */
   renderNumber(parts: readonly number[]): string {
     const first = this.format.indexOf("{n}");
     const last = this.format.lastIndexOf("{n}");

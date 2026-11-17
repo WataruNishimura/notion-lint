@@ -280,20 +280,21 @@ export const ReferencesRule = Type.Object(
     patterns: Type.Array(
       StringOrRegex({
         description:
-          'Reference forms in the body. A string is a template containing {n} (section number) and {title} (heading), e.g. "see section {n}". { pattern } is a regex with named groups n and title',
+          'Reference forms in the body. A string is a template containing {n} (section number) and {title} (heading), e.g. "see section {n}" or {n} "{title}"; it matches case-insensitively, and whitespace matches any whitespace. A {title} between punctuation such as quotes takes any text up to the closing character; elsewhere it only matches existing heading titles. { pattern } is a regex with named groups n and title',
       }),
       { minItems: 1 },
     ),
     notionLinks: Type.Optional(
       Type.Boolean({
         description:
-          "Also check the link text of links to blocks and the heading they point to. Default false",
+          "Also check Notion links: a link to a heading on the same page must read as that heading's current number and title, and a link or mention of another page (or a block on it) must point to something that exists and can be read. Default false",
       }),
     ),
     ignore: Type.Optional(
       Type.Array(
         StringOrRegex({
-          description: "Words not to treat as references (a string matches exactly, or a regex)",
+          description:
+            'Text that is never a reference: a reference that overlaps an occurrence of the string (case-sensitive), or a match of the regex, is skipped (e.g. "RFC 9110, see chapter" or { "pattern": "chapter [0-9]+ of RFC [0-9]+" })',
         }),
       ),
     ),

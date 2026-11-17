@@ -4,7 +4,7 @@ A CLI that checks whether Notion pages match the document "types" written in `no
 
 See [docs/design.md](docs/design.md) for the design.
 
-> Currently implemented: loading and validating the config, the `schema` / `print-config` / `agent` commands, and `check` with property and body (heading tree) matching. `doc.fromTemplate` (the body skeleton is built from a template page's headings). Section numbers and references (`numbering`, `references`) are not checked yet: `check` skips them and reports an info note (see below).
+> Currently implemented: loading and validating the config, the `schema` / `print-config` / `agent` commands, and `check` with property and body (heading tree) matching. `doc.fromTemplate` (the body skeleton is built from a template page's headings), section numbers and references (`numbering`, `references`), and textlint (`text`).
 
 ## `notion-lint check`
 
@@ -26,7 +26,7 @@ notion-lint --format github        # GitHub Actions annotations
 
 - Pages come from `--page` (with the config's `type`) or from `targets`: a `page`, or every page of a `dataSource` (Notion API 2025-09-03 data source ID) whose properties equal the `where` values.
 - Requests are paced to about 3 per second. A 429 response is retried after its Retry-After delay, and 429 / 5xx responses are retried up to 5 times.
-- `--format json` prints the shape in [schema/result.schema.json](schema/result.schema.json) (`notion-lint schema result`): for each page, violations with `pageId`, `blockId`, `path` in the type (`properties.<name>`, `body[1]`, `body[1].children[0]`), `rule`, `severity`, `message`, `suggestions`, and a Notion `url`. `notes` lists parts of a type that were skipped (`rule: "skipped"`, `path` such as `targets[0].type.numbering`); notes do not change `ok` or the exit code.
+- `--format json` prints the shape in [schema/result.schema.json](schema/result.schema.json) (`notion-lint schema result`): for each page, violations with `pageId`, `blockId`, `path` in the type (`properties.<name>`, `body[1]`, `body[1].children[0]`), `rule`, `severity`, `message`, `suggestions`, and a Notion `url`. `notes` lists information that is not a violation, such as a part of a type that a version does not check yet (`rule: "skipped"`); notes do not change `ok` or the exit code. Every part of a type is checked now, so `notes` is empty.
 - A missing `NOTION_TOKEN` or a Notion API error exits with code 2 (`error.kind` is `api`). The token is never printed.
 
 Body text with textlint (`text.textlint`):
@@ -41,8 +41,39 @@ How the body is matched:
 - The page's blocks form a heading tree: blocks under a heading, up to the next heading of the same or a higher level, are its children. Synced blocks and columns are transparent; child pages are not part of the body.
 - The type's `body` headings are mapped in order to the page's headings by name (exact text, or `{ "pattern": ... }`). Rules: `body.missing`, `body.order` (the longest in-order run is kept, the rest are reported), `body.level`, and `body.extra` when `headings.allowExtra` is false (at the top level, and under headings whose `children` are given). `headings.noSkipLevel` reports `headings.skipLevel`.
 - Block entries such as `{ "block": "list", "min": 1 }` are matched in order against the blocks before the first sub-heading at that level; each takes the next run of consecutive blocks of its kind (`body.min`, `body.max`). Empty paragraphs are ignored.
-- With `numbering`, a section number written in the heading's `format` is removed before names are compared. The numbers themselves are not checked yet.
+- With `numbering`, a section number written in the heading's `format` is removed before names are compared.
 - A checkbox property with `required: true` must be checked. People, files, and relation lists longer than 25 are truncated by the API, so `min` is not reported for them.
+
+Section numbers (`numbering`):
+
+```json
+{ "numbering": { "format": { "h1": "{n}. {title}", "h2": "{n}.{n} {title}" }, "sequential": true } }
+```
+
+- Each heading at a level with a `format` is split into a number and a title. `{n}` is one part of the number; whitespace in a format matches any whitespace. Levels without a format are not checked. Headings inside toggles and other blocks count, in document order.
+- `numbering.format`: the heading does not fit its level's format. The suggestion is the heading rewritten with the number it should have (`"2.5 Scope"`).
+- `numbering.hierarchy`: the number does not continue its parent section (an H2 "4.1" under the H1 "3."), or a sub-section number such as "1.1" comes before any numbered parent.
+- `numbering.sequence` (with `sequential`, the default): sibling sections must run 1, 2, 3 under each parent. A gap ("skips 2.3"), a repeat, or a number that goes back is reported once, and counting continues from the number written, so one mistake does not cascade.
+
+References (`references`):
+
+```json
+{
+  "references": {
+    "patterns": ["see chapter {n}", "see section {n}", "{n} \"{title}\"", "see \"{title}\""],
+    "notionLinks": true,
+    "ignore": ["RFC 9110, see chapter", { "pattern": "chapter [0-9]+ of RFC [0-9]+" }]
+  }
+}
+```
+
+- `patterns` are searched in the text of paragraphs, list items, to-dos, toggles, quotes, callouts, and table cells (not code blocks or headings). A template matches case-insensitively. `{n}` is a section number whose parts are joined by `.` or by the separators the `numbering` formats use. A `{title}` between punctuation such as quotes takes the text up to the closing character; an unquoted `{title}` only matches titles of headings on the page, so it cannot report a missing heading. A regex pattern uses the named groups `n` and `title`. When several patterns match the same text, the first pattern wins.
+- `references.number`: the section does not exist (`"see chapter 4": there is no section 4`). `references.mismatch`: number and title disagree (`"2.1 "Background"": 2.1 is "Purpose"; "Background" is 2.2`), with suggestions that fix either the number or the title. `references.title`: no heading has that title.
+- Without `numbering`, a heading that starts with a number like "2.1 " or "2. " still counts as that section, so number references can be checked.
+- `ignore`: a reference that overlaps an occurrence of an ignored string (case-sensitive) or a match of an ignored regex is skipped.
+- `notionLinks`: a text link to a heading on the same page must read as that heading. Link text that starts with a section number must have the heading's current number (and title, if it has one); link text that is another heading's title is also stale. Other link text, such as "here", is not checked. A link to a block that is no longer on the page is reported. All of these are `references.link`. Mentions are not checked for text, since Notion keeps their text up to date.
+- `notionLinks` also checks links to other pages: page mentions, links to pages or to blocks on them, and `link_to_page` blocks. Each target is retrieved once per run (`GET /v1/blocks/{id}`), and `references.target` is reported when it does not exist, cannot be read by the integration, or is in the trash. Other API errors stop the check (exit code 2). The target's section numbers are not checked.
+- Every reference violation has the `blockId` of the block that holds the reference.
 
 ## `notion-lint agent`
 
