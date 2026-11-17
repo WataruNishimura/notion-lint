@@ -49,6 +49,7 @@ describe("NotionFetcher", () => {
     };
     const api: NotionApi = {
       retrievePage: unused,
+      retrieveBlock: unused,
       queryDataSource: unused,
       listBlockChildren: async ({ start_cursor, page_size }) => {
         expect(page_size).toBe(100);
@@ -77,6 +78,7 @@ describe("NotionFetcher", () => {
     const requested: string[] = [];
     const api: NotionApi = {
       retrievePage: unused,
+      retrieveBlock: unused,
       queryDataSource: unused,
       listBlockChildren: async ({ block_id }) => {
         requested.push(block_id);
@@ -91,6 +93,7 @@ describe("NotionFetcher", () => {
   it("paginates a data source query and keeps only pages", async () => {
     const api: NotionApi = {
       retrievePage: unused,
+      retrieveBlock: unused,
       listBlockChildren: unused,
       queryDataSource: async ({ start_cursor }) =>
         start_cursor === undefined
@@ -113,6 +116,7 @@ describe("NotionFetcher", () => {
     const api: NotionApi = {
       listBlockChildren: unused,
       queryDataSource: unused,
+      retrieveBlock: unused,
       retrievePage: async () => {
         calls++;
         if (calls <= 2) throw new FakeApiError(429, "rate_limited", { "Retry-After": "2" });
@@ -131,6 +135,7 @@ describe("NotionFetcher", () => {
     const api: NotionApi = {
       listBlockChildren: unused,
       queryDataSource: unused,
+      retrieveBlock: unused,
       retrievePage: async () => {
         calls++;
         throw new FakeApiError(429, "rate_limited");
@@ -154,6 +159,7 @@ describe("NotionFetcher", () => {
     const api: NotionApi = {
       listBlockChildren: unused,
       queryDataSource: unused,
+      retrieveBlock: unused,
       retrievePage: async () => {
         calls++;
         throw new FakeApiError(404, "object_not_found");
@@ -173,6 +179,7 @@ describe("NotionFetcher", () => {
     const api: NotionApi = {
       listBlockChildren: unused,
       queryDataSource: unused,
+      retrieveBlock: unused,
       retrievePage: async ({ page_id }) => ({ object: "page", id: page_id }),
     };
     const fetcher = new NotionFetcher(api, clock);

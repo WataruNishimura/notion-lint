@@ -14,7 +14,7 @@ A CLI that checks whether Notion pages follow a prescribed format.
 
 ```ts
 // notion-lint.config.ts
-import { defineConfig, doc, prop, h, block, text } from "notion-lint";
+import { defineConfig, doc, prop, h, block, text, numbering, references } from "notion-lint";
 
 // Document type. The 議事録 (meeting notes) type uses Japanese headings and property names on
 // purpose, to show that they are checked as written. The other examples use English names.
@@ -179,6 +179,9 @@ Notion headings have no automatic section numbers, so the numbers are assumed to
 **Section numbers (`numbering`)**
 - Splits heading text into number and title according to `format`. A heading that does not fit the format is a violation.
 - Checks that numbers agree with the heading hierarchy (an H2 "2.1" must follow an H1 "2.") and that there are no gaps or duplicates.
+- How it is implemented:
+  - `{n}` is one part of the number, and whitespace in a format matches any whitespace. Levels without a format are not checked. Headings nested in toggles and other blocks count, in document order.
+  - Rules: `numbering.format` (the suggestion is the heading rewritten with the number it should have), `numbering.hierarchy` (the number does not continue the enclosing numbered section, or "1.1" comes before any numbered parent), and `numbering.sequence` (siblings under one parent must run 1, 2, 3; `sequential` defaults to true). After a gap or a duplicate, counting continues from the number written, so one mistake is reported once.
 
 **References (`references`)**
 - Finds places in the body (paragraphs, lists, tables, callouts, etc.) that match `patterns`, and matches them against the list of headings on the page.
@@ -193,6 +196,14 @@ Notion headings have no automatic section numbers, so the numbers are assumed to
 - When a number and a title disagree, the message shows the fix, e.g. "2.1 is 'Purpose'. 'Background' is 2.2".
 - References to other pages (page mentions, links to blocks on other pages) only check that the target exists and can be read. Checking the target's section numbers is done only when that page is also a check target.
 - "Chapter 3" in the body may refer to a chapter in a different document, so `ignore` lets you specify excluded words or excluded ranges.
+- How it is implemented:
+  - Searched blocks: paragraphs, list items, to-dos, toggles, quotes, callouts, and table cells. Code blocks and headings are not searched.
+  - A template matches case-insensitively, and `{n}` is a number whose parts are joined by `.` or by the separators the `numbering` formats use. A `{title}` between punctuation (quotes, brackets) takes the text up to the closing character. An unquoted `{title}` only matches titles of existing headings, because its end cannot be found otherwise; so it cannot report a missing heading. When several patterns match the same text, the first one wins.
+  - Rules: `references.number` (no such section), `references.mismatch` (number and title disagree; suggestions fix either one), `references.title` (no heading with that title), `references.link` (same-page link text is stale, or the linked block is gone), and `references.target` (another page cannot be read). Each violation carries the block ID of the block that holds the reference.
+  - Without `numbering`, a heading that starts with "2.1 " or "2. " still counts as that section.
+  - `ignore`: a reference that overlaps an occurrence of an ignored string, or a match of an ignored regex, is skipped. A regex covers ranges such as "chapter 3 of RFC 9110".
+  - Same-page links (`notionLinks`): only link text that reads like a reference is checked: text that starts with a section number, or that is another heading's title. Free text such as "here" is not. Mentions are not checked for text, since Notion keeps it up to date.
+  - Other pages (`notionLinks`): page mentions, links to pages or blocks, and `link_to_page` blocks. Each target is retrieved once per run with `GET /v1/blocks/{id}` (a page ID works too); not found, no access, or in the trash is a violation, and other API errors stop the check (exit code 2). The target's section numbers are not checked yet, even when that page is also a check target.
 
 ## Tests
 

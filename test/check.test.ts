@@ -166,27 +166,6 @@ describe("notion-lint check", () => {
     expect(lines[3]).toBe("notion-lint: 1 page checked, 3 problems");
   });
 
-  it("skips parts of a type that are not implemented yet, with a note", async () => {
-    const type = {
-      body: [{ heading: 2, title: "目的" }],
-      numbering: { format: { h2: "{n}. {title}" } },
-      references: { patterns: ["see section {n}"] },
-    };
-    const result = await checkCli(["--page", pageOk, "--format", "json"], {
-      config: JSON.stringify({ type }),
-    });
-    expect(result.code).toBe(0);
-    expect(parseResult(result.stdout).notes).toEqual([
-      expect.objectContaining({ rule: "skipped", path: "type.numbering" }),
-      expect.objectContaining({ rule: "skipped", path: "type.references" }),
-    ]);
-
-    const text = await checkCli(["--page", pageOk], { config: JSON.stringify({ type }) });
-    expect(text.stdout).toContain(
-      "ℹ type.numbering  numbering (section numbers) is not checked yet",
-    );
-  });
-
   it("does not fetch blocks when the type has no body rules", async () => {
     const result = await checkCli(["--page", pageOk, "--format", "json"], {
       config: JSON.stringify({ type: { properties: { 日付: { type: "date" } } } }),

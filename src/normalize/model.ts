@@ -45,10 +45,30 @@ export interface BlockItem {
   id: string;
   /** Notion block type (`paragraph`, `bulleted_list_item`, `to_do`, ...). */
   type: string;
-  /** Plain text of the block's own rich text, if it has any. */
+  /**
+   * Plain text of the block's own rich text, if it has any. For a table row, the cells
+   * joined with newlines.
+   */
   text: string;
   /** Child blocks (toggle contents, nested list items, ...), as a heading tree too. */
   children: BodyItem[];
+  /** Links to Notion pages and blocks in the block's text (absent when there are none). */
+  links?: NotionLink[];
+}
+
+/**
+ * A link to a Notion page or block: a text link to a Notion URL, a page mention, or a
+ * `link_to_page` block. Links to other websites are not kept.
+ */
+export interface NotionLink {
+  /** `link` (text with a URL), `mention` (Notion keeps its text up to date), or `block` (`link_to_page`). */
+  kind: "link" | "mention" | "block";
+  /** The link text (for a mention, the title Notion shows; empty for `link_to_page`). */
+  text: string;
+  /** The linked page (or database), hyphenated. */
+  pageId: string;
+  /** The linked block within that page (the URL fragment), hyphenated; null for a page link. */
+  blockId: string | null;
 }
 
 export type BodyItem = HeadingItem | BlockItem;

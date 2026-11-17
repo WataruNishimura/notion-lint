@@ -45,6 +45,7 @@ export function replayApi(recording: Recording, calls: string[] = []): NotionApi
   };
   return {
     retrievePage: async ({ page_id }) => one(`GET /v1/pages/${page_id}`),
+    retrieveBlock: async ({ block_id }) => one(`GET /v1/blocks/${block_id}`),
     listBlockChildren: async ({ block_id, start_cursor }) =>
       list(`GET /v1/blocks/${block_id}/children`, start_cursor),
     queryDataSource: async ({ data_source_id, start_cursor }) =>

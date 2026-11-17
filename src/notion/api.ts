@@ -24,6 +24,8 @@ export interface ListResponse {
 export interface NotionApi {
   /** `GET /v1/pages/{page_id}` */
   retrievePage(args: { page_id: string }): Promise<unknown>;
+  /** `GET /v1/blocks/{block_id}` (a page ID works too: pages are blocks) */
+  retrieveBlock(args: { block_id: string }): Promise<unknown>;
   /** `GET /v1/blocks/{block_id}/children` */
   listBlockChildren(args: {
     block_id: string;
@@ -52,6 +54,7 @@ export function createNotionApi(token: string): NotionApi {
   });
   return {
     retrievePage: (args) => client.pages.retrieve(args),
+    retrieveBlock: (args) => client.blocks.retrieve(args),
     listBlockChildren: (args) =>
       client.blocks.children.list(args) as unknown as Promise<ListResponse>,
     queryDataSource: (args) => client.dataSources.query(args) as unknown as Promise<ListResponse>,

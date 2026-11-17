@@ -15,6 +15,7 @@ import type {
 import { type PreparedTextlint, prepareTextlint, TextlintSetupError } from "../text/textlint.js";
 import { checkPage, type Finding, needsBody, skippedParts } from "../validate/index.js";
 import { skeletonFromTemplate, withTemplateBody } from "../validate/template.js";
+import { checkOutsideLinks, type LinkCache } from "./links.js";
 
 /**
  * `check`: decide which pages to check, fetch them, normalize, match against their types,
@@ -108,6 +109,7 @@ export async function runCheck(
   // Load textlint first: a missing preset or dictionary is a config error before any request.
   const textlints = plans.map((plan) => loadTextlint(plan, options.baseDir ?? process.cwd()));
   const templates = new Map<string, Promise<BodyItem[]>>();
+  const linkTargets: LinkCache = new Map();
 
   for (const [planIndex, rawPlan] of plans.entries()) {
     const plan = { ...rawPlan, type: await resolveTemplate(rawPlan, fetcher, templates) };
@@ -123,6 +125,7 @@ export async function runCheck(
       const blocks = needsBody(plan.type) ? await fetcher.blocks(id) : [];
       const page = normalizePage(raw, blocks);
       const findings = checkPage(page, plan.type);
+      findings.push(...(await checkOutsideLinks(page, plan.type, fetcher, linkTargets)));
       const textlint = textlints[planIndex];
       if (textlint !== undefined) findings.push(...(await textFindings(textlint, page)));
       results.push(pageResult(page, plan.type, findings));
