@@ -17,7 +17,7 @@ export interface RunResult {
 /** Run the CLI in-process with captured output. */
 export async function runCli(
   argv: string[],
-  options: { stdin?: string; cwd?: string } = {},
+  options: { stdin?: string; cwd?: string } & Pick<Io, "env" | "createFetcher"> = {},
 ): Promise<RunResult> {
   let stdout = "";
   let stderr = "";
@@ -35,6 +35,9 @@ export async function runCli(
       return options.stdin ?? "";
     },
     cwd: options.cwd ?? process.cwd(),
+    // Never fall back to a real NOTION_TOKEN from the environment in tests.
+    env: options.env ?? {},
+    ...(options.createFetcher === undefined ? {} : { createFetcher: options.createFetcher }),
   };
   const code = await run(argv, io);
   return { code, stdout, stderr };

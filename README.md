@@ -4,7 +4,38 @@ A CLI that checks whether Notion pages match the document "types" written in `no
 
 See [docs/design.md](docs/design.md) for the design.
 
-> Currently implemented: loading and validating the config, and the `schema` / `print-config` / `agent` commands. Fetching from the Notion API and matching (the body of `check`) are not implemented yet. `check` validates the config and then returns a `not_implemented` error (exit code 2).
+> Currently implemented: loading and validating the config, the `schema` / `print-config` / `agent` commands, and `check` with property and body (heading tree) matching. Section numbers and references (`numbering`, `references`), textlint (`text`), and `fromTemplate` are not checked yet: `check` skips them and reports an info note (see below).
+
+## `notion-lint check`
+
+```sh
+export NOTION_TOKEN=...   # token of an integration connected to the pages
+notion-lint --page https://www.notion.so/Meeting-0123456789abcdef0123456789abcdef
+notion-lint --format json          # check the config's targets; JSON for agents
+notion-lint --format github        # GitHub Actions annotations
+```
+
+```
+議事録 2026-11-05 臨時  https://www.notion.so/...
+  ✖ properties.参加者     needs at least 1 person (0 found)
+  ✖ body[1]               heading "決定事項" is missing (required after "目的")
+  ✖ headings.noSkipLevel  H3 "詳細" follows H1 "付録" (skips H2)
+
+✖ 3 problems (3 errors, 0 warnings) in 1 of 2 pages
+```
+
+- Pages come from `--page` (with the config's `type`) or from `targets`: a `page`, or every page of a `dataSource` (Notion API 2025-09-03 data source ID) whose properties equal the `where` values.
+- Requests are paced to about 3 per second. A 429 response is retried after its Retry-After delay, and 429 / 5xx responses are retried up to 5 times.
+- `--format json` prints the shape in [schema/result.schema.json](schema/result.schema.json) (`notion-lint schema result`): for each page, violations with `pageId`, `blockId`, `path` in the type (`properties.<name>`, `body[1]`, `body[1].children[0]`), `rule`, `severity`, `message`, `suggestions`, and a Notion `url`. `notes` lists parts of a type that were skipped (`rule: "skipped"`, `path` such as `targets[0].type.numbering`); notes do not change `ok` or the exit code.
+- A missing `NOTION_TOKEN` or a Notion API error exits with code 2 (`error.kind` is `api`). The token is never printed.
+
+How the body is matched:
+
+- The page's blocks form a heading tree: blocks under a heading, up to the next heading of the same or a higher level, are its children. Synced blocks and columns are transparent; child pages are not part of the body.
+- The type's `body` headings are mapped in order to the page's headings by name (exact text, or `{ "pattern": ... }`). Rules: `body.missing`, `body.order` (the longest in-order run is kept, the rest are reported), `body.level`, and `body.extra` when `headings.allowExtra` is false (at the top level, and under headings whose `children` are given). `headings.noSkipLevel` reports `headings.skipLevel`.
+- Block entries such as `{ "block": "list", "min": 1 }` are matched in order against the blocks before the first sub-heading at that level; each takes the next run of consecutive blocks of its kind (`body.min`, `body.max`). Empty paragraphs are ignored.
+- With `numbering`, a section number written in the heading's `format` is removed before names are compared. The numbers themselves are not checked yet.
+- A checkbox property with `required: true` must be checked. People, files, and relation lists longer than 25 are truncated by the API, so `min` is not reported for them.
 
 ## `notion-lint agent`
 

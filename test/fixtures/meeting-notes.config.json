@@ -1,0 +1,18 @@
+{
+  "type": {
+    "name": "議事録",
+    "properties": {
+      "日付": { "type": "date", "required": true },
+      "参加者": { "type": "people", "min": 1 },
+      "種別": { "type": "select", "options": ["定例", "臨時"] },
+      "チケット": { "type": "rich_text", "pattern": "^[A-Z]+-\\d+$", "optional": true }
+    },
+    "body": [
+      { "heading": 2, "title": "目的" },
+      { "heading": 2, "title": "決定事項", "children": [{ "block": "list", "min": 1 }] },
+      { "heading": 2, "title": "TODO", "children": [{ "block": "to_do" }] },
+      { "heading": 2, "title": "メモ", "optional": true }
+    ],
+    "headings": { "noSkipLevel": true, "allowExtra": false }
+  }
+}

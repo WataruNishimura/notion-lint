@@ -157,6 +157,7 @@ describe("result format", () => {
       ok: true,
       summary: { pages: 1, violations: 0, errors: 0, warnings: 0 },
       pages: [],
+      notes: [],
     };
     const dirty: Result = {
       ok: false,
@@ -178,6 +179,7 @@ describe("result format", () => {
           ],
         },
       ],
+      notes: [],
     };
     expect(exitCodeFor(clean)).toBe(0);
     expect(exitCodeFor(dirty)).toBe(1);

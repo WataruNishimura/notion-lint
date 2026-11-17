@@ -28,6 +28,22 @@ export {
   type TextlintOptions,
   text,
 } from "./builders/index.js";
+export { type CheckDeps, check } from "./check/command.js";
+export type {
+  BlockItem,
+  BodyItem,
+  HeadingItem,
+  PageModel,
+  PropertyValue,
+} from "./normalize/model.js";
+export { createNotionApi, NOTION_VERSION, type NotionApi } from "./notion/api.js";
+export {
+  type FetcherOptions,
+  NotionApiError,
+  NotionFetcher,
+  type PageFetcher,
+  type RawBlockTree,
+} from "./notion/fetch.js";
 export {
   BLOCK_KINDS,
   type BlockKind,
@@ -54,6 +70,7 @@ export {
   type ErrorResult,
   ExitCode,
   exitCodeFor,
+  type Note,
   type PageResult,
   type Result,
   ResultSchema,

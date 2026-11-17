@@ -1,13 +1,16 @@
 import { parseArgs } from "node:util";
 import { agentCommand } from "./agent/command.js";
+import { check } from "./check/command.js";
 import {
   type ConfigSource,
   findDefaultConfig,
   type LoadResult,
   loadConfig,
 } from "./config/load.js";
+import type { PageFetcher } from "./notion/fetch.js";
 import { parseNotionId } from "./notion/id.js";
-import { type ErrorKind, type ErrorResult, ExitCode } from "./schema/result.js";
+import { formatGithub, formatJson, formatText } from "./report/index.js";
+import { type ErrorKind, type ErrorResult, ExitCode, exitCodeFor } from "./schema/result.js";
 import { configJsonSchema, resultJsonSchema } from "./schema/validate.js";
 import { VERSION } from "./version.js";
 
@@ -16,12 +19,18 @@ export interface Io {
   stderr(text: string): void;
   readStdin(): Promise<string>;
   cwd: string;
+  /** Environment variables (NOTION_TOKEN). Defaults to process.env. */
+  env?: Record<string, string | undefined>;
+  /** Builds the Notion fetcher from the token. Tests replace it to run without network. */
+  createFetcher?: (token: string) => PageFetcher;
 }
 
 export const FORMATS = ["text", "json", "github"] as const;
 export type Format = (typeof FORMATS)[number];
 
-/** Arguments accepted by `check`. Fetching and validating pages arrive in later PRs. */
+const REPORTERS = { text: formatText, json: formatJson, github: formatGithub } as const;
+
+/** Arguments accepted by `check`. */
 export interface CheckOptions {
   source: ConfigSource;
   /** Pages given with `--page`, as hyphenated IDs. Empty means "use targets". */
@@ -53,7 +62,8 @@ Config (choose one; if omitted, notion-lint.config.ts and similar files in the c
 
 check options:
   --page <URL or ID>      Check only this page, ignoring targets (can be repeated)
-  --format <format>       text (default), json, or github
+  --format <format>       text (default), json, or github (GitHub Actions annotations)
+  The Notion integration token is read from NOTION_TOKEN.
 
 agent options:
   --target <file>         Write to this file only
@@ -239,31 +249,10 @@ async function checkCommand(args: string[], io: Io): Promise<ExitCode> {
   const load = await loadConfig(options.source, { cwd: io.cwd, readStdin: io.readStdin });
   if (!load.ok) return writeError(io, loadError(load), channel);
 
-  if (options.pages.length > 0 && load.config.type === undefined) {
-    return writeError(
-      io,
-      errorResult(
-        "usage",
-        "Checking with --page requires a type (the type to apply to the page) in the config",
-        {
-          source: load.source,
-        },
-      ),
-      channel,
-    );
+  const result = await check(load.config, options.pages, io);
+  if ("error" in result) {
+    return writeError(io, { ...result, error: { ...result.error, source: load.source } }, channel);
   }
-
-  // Fetching pages (Notion API) and matching them against the type come in the next PRs.
-  return writeError(
-    io,
-    errorResult(
-      "internal",
-      "check is not implemented yet (config loading and validation are done)",
-      {
-        code: "not_implemented",
-        source: load.source,
-      },
-    ),
-    channel,
-  );
+  io.stdout(REPORTERS[options.format](result));
+  return exitCodeFor(result);
 }
