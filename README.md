@@ -4,7 +4,25 @@ A CLI that checks whether Notion pages match the document "types" written in `no
 
 See [docs/design.md](docs/design.md) for the design.
 
-> Currently implemented: loading and validating the config, and the `schema` / `print-config` commands. Fetching from the Notion API and matching (the body of `check`) are not implemented yet. `check` validates the config and then returns a `not_implemented` error (exit code 2).
+> Currently implemented: loading and validating the config, and the `schema` / `print-config` / `agent` commands. Fetching from the Notion API and matching (the body of `check`) are not implemented yet. `check` validates the config and then returns a `not_implemented` error (exit code 2).
+
+## `notion-lint agent`
+
+Adds a short section on how to use notion-lint to the repository's agent instruction file, so agents pick it up.
+
+```sh
+notion-lint agent                           # add or refresh the section
+notion-lint agent --dry-run                 # show a diff only
+notion-lint agent --print                   # print the section to standard output only
+notion-lint agent --remove                  # remove the section
+notion-lint agent --target docs/AGENTS.md   # write to this file
+notion-lint agent --create AGENTS.md        # create the file when none exists
+```
+
+- The root is the first Git root found walking up from the current directory (outside Git, the current directory). Files are matched case-insensitively: `AGENTS.md`, `AGENT.md`, `CLAUDE.md`, `.claude/CLAUDE.md`.
+- One file found: that file. A file that imports another found file with an `@AGENTS.md` line is skipped, so the text is not loaded twice. Several files with no import: all of them. None: nothing is written and the exit code is 2.
+- The section sits between `<!-- notion-lint:start -->` and `<!-- notion-lint:end -->` and contains the notion-lint version. Running again replaces only that range; everything outside it stays byte for byte the same.
+- `--create` creates the file in the repository root, and only when no instruction file exists.
 
 ## Usage
 

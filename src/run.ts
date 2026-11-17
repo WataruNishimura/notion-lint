@@ -1,4 +1,5 @@
 import { parseArgs } from "node:util";
+import { agentCommand } from "./agent/command.js";
 import {
   type ConfigSource,
   findDefaultConfig,
@@ -35,11 +36,14 @@ Usage:
   notion-lint [check] [config] [--page <URL or ID>]... [--format text|json|github]
   notion-lint schema [config|result]
   notion-lint print-config [config]
+  notion-lint agent [--target <file>] [--dry-run | --print | --remove] [--create <file>]
 
 Commands:
   check          Check pages (the default command)
   schema         Print the JSON Schema of the config (config) or of the --format json output (result)
   print-config   Load the config and print it as JSON
+  agent          Write how to use notion-lint into the repository's agent instruction file
+                 (AGENTS.md, AGENT.md, CLAUDE.md, .claude/CLAUDE.md)
 
 Config (choose one; if omitted, notion-lint.config.ts and similar files in the current directory are used):
   --config <path>         Config file (.ts / .mts / .js / .mjs are executed; .json is read as JSON)
@@ -50,6 +54,13 @@ Config (choose one; if omitted, notion-lint.config.ts and similar files in the c
 check options:
   --page <URL or ID>      Check only this page, ignoring targets (can be repeated)
   --format <format>       text (default), json, or github
+
+agent options:
+  --target <file>         Write to this file only
+  --dry-run               Show a diff without writing
+  --print                 Print the section to standard output only
+  --remove                Remove the section
+  --create <file>         Create this file (in the repository root) when no instruction file exists
 
 Exit codes:
   0  No violations
@@ -137,6 +148,8 @@ export async function run(argv: readonly string[], io: Io): Promise<ExitCode> {
       return schemaCommand(args, io);
     case "print-config":
       return printConfigCommand(args, io);
+    case "agent":
+      return agentCommand(args, io);
     case "check":
       return checkCommand(args, io);
     default:
