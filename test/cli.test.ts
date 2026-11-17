@@ -117,7 +117,7 @@ export default defineConfig({ type: doc({ body: [h.h2("目的")] }) });
     expect(result.code).toBe(2);
     expect((globalThis as { __notionLintRan?: boolean }).__notionLintRan).toBeUndefined();
     expect(parse(result.stderr)).toMatchObject({
-      error: { kind: "config", message: expect.stringContaining("JSON として読めません") },
+      error: { kind: "config", message: expect.stringContaining("Cannot read") },
     });
   });
 

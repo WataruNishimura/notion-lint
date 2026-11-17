@@ -34,20 +34,24 @@ function convert(value: unknown, path: string, ancestors: Set<object>): unknown 
     case "boolean":
       return value;
     case "number":
-      if (!Number.isFinite(value)) throw new ConfigDataError(`${value} は JSON にできません`, path);
+      if (!Number.isFinite(value))
+        throw new ConfigDataError(`${value} cannot be written as JSON`, path);
       return value;
     case "undefined":
-      throw new ConfigDataError("undefined は JSON にできません", path);
+      throw new ConfigDataError("undefined cannot be written as JSON", path);
     case "function":
-      throw new ConfigDataError("関数は設定に書けません (設定は JSON にできる値だけ)", path);
+      throw new ConfigDataError(
+        "A function cannot be written in the config (only values that JSON can represent)",
+        path,
+      );
     case "symbol":
     case "bigint":
-      throw new ConfigDataError(`${typeof value} は JSON にできません`, path);
+      throw new ConfigDataError(`${typeof value} cannot be written as JSON`, path);
   }
   if (value === null) return null;
 
   const object = value as object;
-  if (ancestors.has(object)) throw new ConfigDataError("循環参照があります", path);
+  if (ancestors.has(object)) throw new ConfigDataError("Circular reference", path);
   ancestors.add(object);
   try {
     if (object instanceof RegExp) return regexToData(object);
@@ -60,7 +64,7 @@ function convert(value: unknown, path: string, ancestors: Set<object>): unknown 
     const proto = Object.getPrototypeOf(object);
     if (proto !== Object.prototype && proto !== null) {
       const name = (object as { constructor?: { name?: string } }).constructor?.name ?? "object";
-      throw new ConfigDataError(`${name} は JSON にできません`, path);
+      throw new ConfigDataError(`${name} cannot be written as JSON`, path);
     }
     const out: Record<string, unknown> = {};
     for (const [key, item] of Object.entries(object)) {

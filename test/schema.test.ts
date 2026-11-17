@@ -172,7 +172,7 @@ describe("result format", () => {
               path: "properties.参加者",
               rule: "property.min",
               severity: "error",
-              message: "1 人以上必要 (0 人)",
+              message: "needs at least 1 person (0 found)",
               suggestions: [],
             },
           ],

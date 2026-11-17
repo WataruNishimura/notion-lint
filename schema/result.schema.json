@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "notion-lint result",
-  "description": "notion-lint check --format json の出力",
+  "description": "Output of notion-lint check --format json",
   "type": "object",
   "anyOf": [
     {
@@ -24,7 +24,7 @@
       },
       "then": {
         "additionalProperties": false,
-        "description": "検査の結果 (終了コード 0 または 1)",
+        "description": "Check result (exit code 0 or 1)",
         "type": "object",
         "required": [
           "ok",
@@ -33,7 +33,7 @@
         ],
         "properties": {
           "ok": {
-            "description": "違反が 1 つもなければ true (終了コード 0)",
+            "description": "true if there are no violations (exit code 0)",
             "type": "boolean"
           },
           "summary": {
@@ -85,7 +85,7 @@
                   "type": "string"
                 },
                 "typeName": {
-                  "description": "当てた型の name",
+                  "description": "name of the type that was applied",
                   "type": "string"
                 },
                 "violations": {
@@ -104,7 +104,7 @@
                     ],
                     "properties": {
                       "pageId": {
-                        "description": "ページ ID",
+                        "description": "Page ID",
                         "type": "string"
                       },
                       "blockId": {
@@ -112,18 +112,18 @@
                           "string",
                           "null"
                         ],
-                        "description": "ブロック ID。プロパティの違反や、ブロックがないことの違反では null"
+                        "description": "Block ID. null for property violations and for violations about a missing block"
                       },
                       "path": {
-                        "description": "型のどこに対応するか (例: body[1]、body[1].children[0]、properties.参加者)",
+                        "description": "Where in the type it applies (e.g. body[1], body[1].children[0], properties.Attendees)",
                         "type": "string"
                       },
                       "rule": {
-                        "description": "違反の種類 (例: property.min、body.missing、body.order、numbering.sequence、textlint/<ルール名>)",
+                        "description": "Kind of violation (e.g. property.min, body.missing, body.order, numbering.sequence, textlint/<rule name>)",
                         "type": "string"
                       },
                       "severity": {
-                        "description": "error は型に合わない。warning は textlint の指摘など",
+                        "description": "error means the page does not match the type. warning is for things like textlint findings",
                         "type": "string",
                         "enum": [
                           "error",
@@ -137,25 +137,25 @@
                         "type": "array",
                         "items": {
                           "additionalProperties": false,
-                          "description": "直し方の候補",
+                          "description": "Candidate fix",
                           "type": "object",
                           "required": [
                             "message"
                           ],
                           "properties": {
                             "message": {
-                              "description": "直し方の説明 (例: 「2.1 は『目的』です。『背景』は 2.2 です」)",
+                              "description": "Explanation of the fix (e.g. \"Section 2.1 is 'Purpose'. 'Background' is 2.2\")",
                               "type": "string"
                             },
                             "replacement": {
-                              "description": "置き換える文字列が決まるときはその文字列",
+                              "description": "The replacement text, when it is known",
                               "type": "string"
                             }
                           }
                         }
                       },
                       "url": {
-                        "description": "違反箇所への Notion のリンク",
+                        "description": "Notion link to the violation",
                         "type": "string"
                       }
                     }
@@ -175,7 +175,7 @@
       },
       "then": {
         "additionalProperties": false,
-        "description": "設定エラーや API エラー (終了コード 2)",
+        "description": "Config or API error (exit code 2)",
         "type": "object",
         "required": [
           "ok",
@@ -195,7 +195,7 @@
             ],
             "properties": {
               "kind": {
-                "description": "usage: 引数の誤り、config: 設定の読み込みや Schema の不一致、api: Notion API のエラー、internal: その他",
+                "description": "usage: invalid arguments, config: config loading or schema mismatch, api: Notion API error, internal: other",
                 "type": "string",
                 "enum": [
                   "usage",
@@ -205,18 +205,18 @@
                 ]
               },
               "code": {
-                "description": "細かい種類 (例: not_implemented)",
+                "description": "Finer kind (e.g. not_implemented)",
                 "type": "string"
               },
               "message": {
                 "type": "string"
               },
               "source": {
-                "description": "設定の出どころ (ファイルのパス、stdin、--config-json)",
+                "description": "Where the config came from (file path, stdin, --config-json)",
                 "type": "string"
               },
               "issues": {
-                "description": "Schema に合わなかった項目",
+                "description": "Fields that did not match the schema",
                 "type": "array",
                 "items": {
                   "additionalProperties": false,
@@ -229,15 +229,15 @@
                   ],
                   "properties": {
                     "path": {
-                      "description": "読みやすい位置 (例: type.body[1].heading)。ルートは空文字",
+                      "description": "Readable location (e.g. type.body[1].heading). Empty string for the root",
                       "type": "string"
                     },
                     "pointer": {
-                      "description": "JSON Pointer (例: /type/body/1/heading)",
+                      "description": "JSON Pointer (e.g. /type/body/1/heading)",
                       "type": "string"
                     },
                     "keyword": {
-                      "description": "合わなかった JSON Schema のキーワード",
+                      "description": "JSON Schema keyword that did not match",
                       "type": "string"
                     },
                     "message": {

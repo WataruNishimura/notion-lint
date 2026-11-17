@@ -29,32 +29,32 @@ export interface CheckOptions {
 }
 
 const HELP = `notion-lint ${VERSION}
-Notion のページが、設定に書いた文書の「型」に合っているかを検証する。
+Checks that Notion pages match the document "types" written in your config.
 
-使い方:
-  notion-lint [check] [設定] [--page <URL か ID>]... [--format text|json|github]
+Usage:
+  notion-lint [check] [config] [--page <URL or ID>]... [--format text|json|github]
   notion-lint schema [config|result]
-  notion-lint print-config [設定]
+  notion-lint print-config [config]
 
-コマンド:
-  check          ページを検査する (既定のコマンド)
-  schema         設定 (config) または --format json の出力 (result) の JSON Schema を出す
-  print-config   設定を読み込み、JSON にして出す
+Commands:
+  check          Check pages (the default command)
+  schema         Print the JSON Schema of the config (config) or of the --format json output (result)
+  print-config   Load the config and print it as JSON
 
-設定 (どれか 1 つ。省略するとカレントディレクトリの notion-lint.config.ts などを使う):
-  --config <path>         設定ファイル (.ts / .mts / .js / .mjs は実行、.json は JSON として読む)
-  --config -              標準入力から JSON を読む
-  --config-json '<json>'  引数の JSON を読む
-  JSON はコードとして実行しない。
+Config (choose one; if omitted, notion-lint.config.ts and similar files in the current directory are used):
+  --config <path>         Config file (.ts / .mts / .js / .mjs are executed; .json is read as JSON)
+  --config -              Read JSON from standard input
+  --config-json '<json>'  Read JSON given as an argument
+  JSON is never executed as code.
 
-check のオプション:
-  --page <URL か ID>      targets を使わず、このページだけを検査する (複数可)
-  --format <形式>         text (既定)、json、github
+check options:
+  --page <URL or ID>      Check only this page, ignoring targets (can be repeated)
+  --format <format>       text (default), json, or github
 
-終了コード:
-  0  違反なし
-  1  違反あり
-  2  設定エラー、引数の誤り、Notion API のエラー (--format json なら JSON で返す)
+Exit codes:
+  0  No violations
+  1  Violations found
+  2  Config error, invalid arguments, or Notion API error (with --format json, returned as JSON)
 `;
 
 class UsageError extends Error {}
@@ -80,7 +80,7 @@ function writeError(io: Io, result: ErrorResult, channel: "stdout" | "stderr" | 
     const where = error.source === undefined ? "" : ` (${error.source})`;
     let text = `notion-lint: ${error.message}${where}\n`;
     for (const issue of error.issues ?? []) {
-      text += `  ✖ ${issue.path === "" ? "(ルート)" : issue.path}  ${issue.message}\n`;
+      text += `  ✖ ${issue.path === "" ? "(root)" : issue.path}  ${issue.message}\n`;
     }
     io.stderr(text);
   }
@@ -104,7 +104,7 @@ function configSource(
   cwd: string,
 ): ConfigSource {
   if (values.config !== undefined && values["config-json"] !== undefined) {
-    throw new UsageError("--config と --config-json は同時に指定できません");
+    throw new UsageError("--config and --config-json cannot be used together");
   }
   if (values["config-json"] !== undefined) return { kind: "inline", json: values["config-json"] };
   if (values.config === "-") return { kind: "stdin" };
@@ -112,7 +112,7 @@ function configSource(
   const found = findDefaultConfig(cwd);
   if (found === undefined) {
     throw new UsageError(
-      "設定がありません。--config <path>、--config -、--config-json のどれかで渡すか、notion-lint.config.ts を置いてください",
+      "No config given. Pass one with --config <path>, --config -, or --config-json, or place notion-lint.config.ts in the current directory",
     );
   }
   return { kind: "file", path: found };
@@ -142,7 +142,7 @@ export async function run(argv: readonly string[], io: Io): Promise<ExitCode> {
     default:
       return writeError(
         io,
-        errorResult("usage", `不明なコマンドです: ${command} (notion-lint --help を参照)`),
+        errorResult("usage", `Unknown command: ${command} (see notion-lint --help)`),
         "stderr",
       );
   }
@@ -152,8 +152,7 @@ function schemaCommand(args: string[], io: Io): ExitCode {
   let which: string;
   try {
     const { positionals } = parseArgs({ args, options: {}, allowPositionals: true, strict: true });
-    if (positionals.length > 1)
-      throw new UsageError("schema に渡せるのは config か result だけです");
+    if (positionals.length > 1) throw new UsageError("schema accepts only config or result");
     which = positionals[0] ?? "config";
   } catch (error) {
     return writeError(io, errorResult("usage", (error as Error).message), "stderr");
@@ -163,7 +162,7 @@ function schemaCommand(args: string[], io: Io): ExitCode {
   else {
     return writeError(
       io,
-      errorResult("usage", `schema の種類は config か result です: ${which}`),
+      errorResult("usage", `The schema kind must be config or result: ${which}`),
       "stderr",
     );
   }
@@ -196,12 +195,11 @@ export function parseCheckArgs(args: string[], cwd: string): CheckOptions {
   });
   const format = values.format as string;
   if (!(FORMATS as readonly string[]).includes(format)) {
-    throw new UsageError(`--format は ${FORMATS.join(" / ")} のどれかです: ${format}`);
+    throw new UsageError(`--format must be one of ${FORMATS.join(" / ")}: ${format}`);
   }
   const pages = (values.page ?? []).map((page) => {
     const id = parseNotionId(page);
-    if (id === undefined)
-      throw new UsageError(`--page にページの URL か ID を指定してください: ${page}`);
+    if (id === undefined) throw new UsageError(`--page needs a page URL or ID: ${page}`);
     return id;
   });
   return { source: configSource(values, cwd), pages, format: format as Format };
@@ -231,9 +229,13 @@ async function checkCommand(args: string[], io: Io): Promise<ExitCode> {
   if (options.pages.length > 0 && load.config.type === undefined) {
     return writeError(
       io,
-      errorResult("usage", "--page で検査するには設定に type (ページに当てる型) が必要です", {
-        source: load.source,
-      }),
+      errorResult(
+        "usage",
+        "Checking with --page requires a type (the type to apply to the page) in the config",
+        {
+          source: load.source,
+        },
+      ),
       channel,
     );
   }
@@ -241,10 +243,14 @@ async function checkCommand(args: string[], io: Io): Promise<ExitCode> {
   // Fetching pages (Notion API) and matching them against the type come in the next PRs.
   return writeError(
     io,
-    errorResult("internal", "check はまだ実装されていません (設定の読み込みと検証までは完了)", {
-      code: "not_implemented",
-      source: load.source,
-    }),
+    errorResult(
+      "internal",
+      "check is not implemented yet (config loading and validation are done)",
+      {
+        code: "not_implemented",
+        source: load.source,
+      },
+    ),
     channel,
   );
 }

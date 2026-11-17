@@ -19,12 +19,12 @@ import {
 
 const presence = {
   required: Type.Optional(
-    Type.Boolean({ description: "true なら値が空であってはならない。既定は false" }),
+    Type.Boolean({ description: "If true, the value must not be empty. Default false" }),
   ),
   optional: Type.Optional(
     Type.Boolean({
       description:
-        "true ならページにこのプロパティ自体がなくてもよい (あれば他の条件を見る)。既定は false",
+        "If true, the property may be absent from the page (if it is present, the other checks still apply). Default false",
     }),
   ),
 };
@@ -33,17 +33,22 @@ const textMatch = {
   pattern: Type.Optional(
     Type.String({
       format: "regex",
-      description: "値 (プレーンテキスト) が合うべき正規表現のソース。空の値には適用しない",
+      description:
+        "Regex source that the value (plain text) must match. Not applied to empty values",
     }),
   ),
   flags: Type.Optional(
-    Type.String({ pattern: "^[dgimsuvy]*$", description: "pattern のフラグ (例: iu)" }),
+    Type.String({ pattern: "^[dgimsuvy]*$", description: "Flags for pattern (e.g. iu)" }),
   ),
 };
 
 const count = {
-  min: Type.Optional(Type.Integer({ minimum: 0, description: "要素数の下限" })),
-  max: Type.Optional(Type.Integer({ minimum: 0, description: "要素数の上限" })),
+  min: Type.Optional(
+    Type.Integer({ minimum: 0, description: "Lower bound on the number of items" }),
+  ),
+  max: Type.Optional(
+    Type.Integer({ minimum: 0, description: "Upper bound on the number of items" }),
+  ),
 };
 
 const options = {
@@ -51,7 +56,7 @@ const options = {
     Type.Array(Type.String({ minLength: 1 }), {
       minItems: 1,
       uniqueItems: true,
-      description: "許す選択肢の名前。省略するとデータソースにある選択肢をすべて許す",
+      description: "Allowed option names. If omitted, every option in the data source is allowed",
     }),
   ),
 };
@@ -75,32 +80,32 @@ function propVariant<const K extends string, P extends TProperties>(
 export const PropSpec = TaggedUnion(
   "type",
   [
-    propVariant("title", textMatch, "タイトルプロパティ"),
-    propVariant("rich_text", textMatch, "テキストプロパティ"),
+    propVariant("title", textMatch, "Title property"),
+    propVariant("rich_text", textMatch, "Rich text property"),
     propVariant(
       "number",
       {
-        min: Type.Optional(Type.Number({ description: "値の下限" })),
-        max: Type.Optional(Type.Number({ description: "値の上限" })),
+        min: Type.Optional(Type.Number({ description: "Lower bound of the value" })),
+        max: Type.Optional(Type.Number({ description: "Upper bound of the value" })),
       },
-      "数値プロパティ",
+      "Number property",
     ),
-    propVariant("select", options, "セレクトプロパティ"),
-    propVariant("multi_select", { ...options, ...count }, "マルチセレクトプロパティ"),
-    propVariant("status", options, "ステータスプロパティ"),
-    propVariant("date", {}, "日付プロパティ"),
-    propVariant("people", count, "ユーザープロパティ"),
-    propVariant("files", count, "ファイルプロパティ"),
-    propVariant("checkbox", {}, "チェックボックスプロパティ"),
-    propVariant("url", textMatch, "URL プロパティ"),
-    propVariant("email", textMatch, "メールプロパティ"),
-    propVariant("phone_number", textMatch, "電話番号プロパティ"),
-    propVariant("relation", count, "リレーションプロパティ"),
+    propVariant("select", options, "Select property"),
+    propVariant("multi_select", { ...options, ...count }, "Multi-select property"),
+    propVariant("status", options, "Status property"),
+    propVariant("date", {}, "Date property"),
+    propVariant("people", count, "People property"),
+    propVariant("files", count, "Files property"),
+    propVariant("checkbox", {}, "Checkbox property"),
+    propVariant("url", textMatch, "URL property"),
+    propVariant("email", textMatch, "Email property"),
+    propVariant("phone_number", textMatch, "Phone number property"),
+    propVariant("relation", count, "Relation property"),
   ],
   {
     $id: "PropSpec",
     title: "PropSpec",
-    description: "プロパティの型。type は Notion API のプロパティ型名",
+    description: "Property type. type is the Notion API property type name",
   },
 );
 export type PropSpec = Static<typeof PropSpec>;
@@ -136,43 +141,50 @@ export const BodyNode = Type.Recursive(
       [
         Type.Object(
           {
-            heading: IntegerEnum(HEADING_LEVELS, { description: "見出しのレベル (1〜3)" }),
+            heading: IntegerEnum(HEADING_LEVELS, { description: "Heading level (1 to 3)" }),
             title: StringOrRegex({
               description:
-                "見出しの文字列。文字列なら完全一致、{ pattern } なら正規表現。章番号 (numbering) を除いた部分と照合する",
+                "Heading text. A string must match exactly; { pattern } is a regex. Matched against the text without the section number (numbering)",
             }),
             optional: Type.Optional(
-              Type.Boolean({ description: "true ならこの見出しがなくてもよい。既定は false" }),
+              Type.Boolean({ description: "If true, this heading may be absent. Default false" }),
             ),
             children: Type.Optional(
-              Type.Array(Self, { description: "見出しの下 (次の同レベル以上の見出しまで) の骨格" }),
+              Type.Array(Self, {
+                description:
+                  "Skeleton under this heading (up to the next heading of the same or a higher level)",
+              }),
             ),
           },
-          { additionalProperties: false, description: "見出し" },
+          { additionalProperties: false, description: "Heading" },
         ),
         Type.Object(
           {
             block: StringEnum(BLOCK_KINDS, {
               description:
-                "ブロックの種類。list は箇条書きと番号付きリストのどちらでもよい。any は種類を問わない",
+                "Block kind. list accepts either a bulleted or a numbered list. any accepts any kind",
             }),
             min: Type.Optional(
               Type.Integer({
                 minimum: 0,
                 description:
-                  "この位置に続く、この種類のブロックの数の下限。既定は 1 (0 なら省略可)",
+                  "Lower bound on the number of blocks of this kind at this position. Default 1 (0 makes it optional)",
               }),
             ),
             max: Type.Optional(
-              Type.Integer({ minimum: 1, description: "同じく上限。既定は上限なし" }),
+              Type.Integer({
+                minimum: 1,
+                description: "Upper bound, same as above. Default: no upper bound",
+              }),
             ),
             children: Type.Optional(
               Type.Array(Self, {
-                description: "このブロックの子ブロック (トグルの中身など) の骨格",
+                description:
+                  "Skeleton of the child blocks of this block (e.g. the contents of a toggle)",
               }),
             ),
           },
-          { additionalProperties: false, description: "見出し以外のブロック" },
+          { additionalProperties: false, description: "A block other than a heading" },
         ),
       ],
     ),
@@ -180,7 +192,7 @@ export const BodyNode = Type.Recursive(
     $id: "BodyNode",
     title: "BodyNode",
     description:
-      "本文の骨格の 1 要素。heading を持てば見出し、block を持てばそれ以外のブロック。配列の上から順に並ぶことを要求する",
+      "One element of the body skeleton. An element with heading is a heading; one with block is any other block. The array must appear in this order, from top to bottom",
   },
 );
 export type BodyNode = Static<typeof BodyNode>;
@@ -193,13 +205,15 @@ export type BlockNode = Extract<BodyNode, { block: BlockKind }>;
 export const HeadingsRule = Type.Object(
   {
     noSkipLevel: Type.Optional(
-      Type.Boolean({ description: "見出しのレベルを飛ばさない (H1 の次に H3 など)。既定は false" }),
+      Type.Boolean({
+        description: "Do not skip heading levels (e.g. H3 right after H1). Default false",
+      }),
     ),
     allowExtra: Type.Optional(
-      Type.Boolean({ description: "body にない見出しを許す。既定は true" }),
+      Type.Boolean({ description: "Allow headings that are not in body. Default true" }),
     ),
   },
-  { additionalProperties: false, description: "見出し全体の規則" },
+  { additionalProperties: false, description: "Rules for the whole heading structure" },
 );
 export type HeadingsRule = Static<typeof HeadingsRule>;
 
@@ -210,27 +224,27 @@ export const TextRule = Type.Object(
         {
           presets: Type.Optional(
             Type.Array(Type.String({ minLength: 1 }), {
-              description: "textlint のプリセット名 (例: ja-technical-writing)",
+              description: "textlint preset names (e.g. ja-technical-writing)",
             }),
           ),
           rules: Type.Optional(
             Type.Record(
               Type.String(),
               Type.Unsafe<boolean | Record<string, unknown>>({ type: ["boolean", "object"] }),
-              { description: "textlint のルール名と設定 (true / false / オプション)" },
+              { description: "textlint rule names and their settings (true / false / options)" },
             ),
           ),
           prh: Type.Optional(
             Type.Array(Type.String({ minLength: 1 }), {
-              description: "prh の辞書ファイルのパス (設定ファイルからの相対パス)",
+              description: "Paths to prh dictionary files (relative to the config file)",
             }),
           ),
         },
-        { additionalProperties: false, description: "textlint で本文を検査する" },
+        { additionalProperties: false, description: "Check the body with textlint" },
       ),
     ),
   },
-  { additionalProperties: false, description: "本文の表記の検査" },
+  { additionalProperties: false, description: "Check of the notation in the body" },
 );
 export type TextRule = Static<typeof TextRule>;
 
@@ -238,7 +252,7 @@ const numberingFormat = (level: string) =>
   Type.Optional(
     Type.String({
       pattern: "\\{title\\}",
-      description: `${level} の書き方。{n} が番号の各段、{title} がタイトル (例: "{n}.{n} {title}")`,
+      description: `Format for ${level} headings. {n} is each part of the number, {title} is the title (e.g. "{n}.{n} {title}")`,
     }),
   );
 
@@ -249,10 +263,15 @@ export const NumberingRule = Type.Object(
       { additionalProperties: false, minProperties: 1 },
     ),
     sequential: Type.Optional(
-      Type.Boolean({ description: "番号が 1, 2, 3 と抜けや重複なく続く。既定は true" }),
+      Type.Boolean({
+        description: "Numbers run 1, 2, 3 without gaps or duplicates. Default true",
+      }),
     ),
   },
-  { additionalProperties: false, description: "見出しに手で書かれた章番号の規則" },
+  {
+    additionalProperties: false,
+    description: "Rules for the section numbers written by hand in headings",
+  },
 );
 export type NumberingRule = Static<typeof NumberingRule>;
 
@@ -261,47 +280,55 @@ export const ReferencesRule = Type.Object(
     patterns: Type.Array(
       StringOrRegex({
         description:
-          '本文中の参照の書き方。文字列は {n} (章番号) と {title} (見出し) を含むひな形 (例: "{n}章")。{ pattern } なら名前付きグループ n / title を持つ正規表現',
+          'Reference forms in the body. A string is a template containing {n} (section number) and {title} (heading), e.g. "see section {n}". { pattern } is a regex with named groups n and title',
       }),
       { minItems: 1 },
     ),
     notionLinks: Type.Optional(
       Type.Boolean({
-        description: "ブロックへのリンクの文字列とリンク先の見出しも照合する。既定は false",
+        description:
+          "Also check the link text of links to blocks and the heading they point to. Default false",
       }),
     ),
     ignore: Type.Optional(
       Type.Array(
-        StringOrRegex({ description: "参照として扱わない語 (文字列は完全一致、または正規表現)" }),
+        StringOrRegex({
+          description: "Words not to treat as references (a string matches exactly, or a regex)",
+        }),
       ),
     ),
   },
-  { additionalProperties: false, description: "本文中の章への参照と見出しの照合" },
+  {
+    additionalProperties: false,
+    description: "Match section references in the body against the headings",
+  },
 );
 export type ReferencesRule = Static<typeof ReferencesRule>;
 
 export const TemplateSource = Type.Object(
   {
-    page: Type.String({ minLength: 1, description: "テンプレートページの ID か URL" }),
+    page: Type.String({ minLength: 1, description: "ID or URL of the template page" }),
   },
   {
     additionalProperties: false,
     description:
-      "テンプレートページから body を作る。同じ型に書いた body / properties はテンプレートからの分より優先する",
+      "Build body from a template page. body / properties written in the same type take precedence over those from the template",
   },
 );
 export type TemplateSource = Static<typeof TemplateSource>;
 
 export const DocType = Type.Object(
   {
-    name: Type.Optional(Type.String({ minLength: 1, description: "型の名前 (結果の表示に使う)" })),
+    name: Type.Optional(
+      Type.String({ minLength: 1, description: "Name of the type (shown in results)" }),
+    ),
     fromTemplate: Type.Optional(TemplateSource),
     properties: Type.Optional(
       Type.Record(Type.String({ minLength: 1 }), RefTo(PropSpec), {
-        description: "プロパティ名ごとの型",
+        description: "Type for each property name",
       }),
     ),
-    body: Type.Optional(Type.Array(RefTo(BodyNode), { description: "本文の骨格" })),
+    body: Type.Optional(Type.Array(RefTo(BodyNode), { description: "Body skeleton" })),
     headings: Type.Optional(HeadingsRule),
     text: Type.Optional(TextRule),
     numbering: Type.Optional(NumberingRule),
@@ -311,7 +338,7 @@ export const DocType = Type.Object(
     $id: "DocType",
     title: "DocType",
     additionalProperties: false,
-    description: "文書の型。ページがこれに合うかを検査する",
+    description: "Document type. Checks whether a page matches it",
   },
 );
 export type DocType = Static<typeof DocType>;
@@ -328,36 +355,39 @@ export const Target = KeyedUnion(
   [
     Type.Object(
       {
-        dataSource: Type.String({ minLength: 1, description: "データソースの ID か URL" }),
+        dataSource: Type.String({ minLength: 1, description: "Data source ID or URL" }),
         where: Type.Optional(
           Type.Record(Type.String({ minLength: 1 }), WhereValue, {
-            description: "プロパティ名と値。すべて等しいページだけを検査する",
+            description:
+              "Property names and values. Only pages where all of them match are checked",
           }),
         ),
         type: RefTo(DocType),
       },
-      { additionalProperties: false, description: "データソースのページに型を当てる" },
+      { additionalProperties: false, description: "Apply a type to the pages of a data source" },
     ),
     Type.Object(
       {
-        page: Type.String({ minLength: 1, description: "ページの ID か URL" }),
+        page: Type.String({ minLength: 1, description: "Page ID or URL" }),
         type: RefTo(DocType),
       },
-      { additionalProperties: false, description: "1 つのページに型を当てる" },
+      { additionalProperties: false, description: "Apply a type to one page" },
     ),
   ],
-  { description: "どのページにどの型を当てるか。dataSource か page のどちらかを持つ" },
+  {
+    description: "Which type applies to which pages. Has either dataSource or page",
+  },
 );
 export type Target = Static<typeof Target>;
 
 export const ConfigSchema = Type.Object(
   {
     $schema: Type.Optional(
-      Type.String({ description: "エディタ向けの Schema の場所 (無視される)" }),
+      Type.String({ description: "Location of the schema for editors (ignored)" }),
     ),
     type: Type.Optional(
       RefTo(DocType, {
-        description: "--page で指定したページに当てる型",
+        description: "Type applied to the page given with --page",
       }),
     ),
     targets: Type.Optional(Type.Array(Target, { minItems: 1 })),
@@ -366,7 +396,7 @@ export const ConfigSchema = Type.Object(
     $schema: "http://json-schema.org/draft-07/schema#",
     title: "notion-lint config",
     description:
-      "notion-lint の設定。type (--page で検査するページの型) か targets のどちらか、または両方を持つ",
+      "notion-lint config. Has type (the type for the page checked with --page), targets, or both",
     additionalProperties: false,
     anyOf: [{ required: ["type"] }, { required: ["targets"] }],
     definitions: { DocType, BodyNode, PropSpec },

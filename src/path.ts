@@ -1,6 +1,6 @@
 /**
  * Readable locations used in errors and violations: `type.body[1].heading`,
- * `type.properties.参加者`, `targets[0]["odd.key"]`. The root is the empty string.
+ * `type.properties.Attendees`, `targets[0]["odd.key"]`. The root is the empty string.
  */
 
 const PLAIN_KEY = /^[^\s.[\]"'\\]+$/;

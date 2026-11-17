@@ -106,10 +106,10 @@ export const Regex = Type.Object(
   {
     pattern: Type.String({
       format: "regex",
-      description: "JavaScript の正規表現のソース (スラッシュで囲まない)",
+      description: "Regex source in JavaScript (without the surrounding slashes)",
     }),
     flags: Type.Optional(
-      Type.String({ pattern: "^[dgimsuvy]*$", description: "正規表現のフラグ (例: iu)" }),
+      Type.String({ pattern: "^[dgimsuvy]*$", description: "Regex flags (e.g. iu)" }),
     ),
   },
   { additionalProperties: false },

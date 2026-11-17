@@ -7,41 +7,45 @@ import { KeyedUnion, StringEnum } from "./helpers.js";
  */
 
 export const Severity = StringEnum(["error", "warning"] as const, {
-  description: "error は型に合わない。warning は textlint の指摘など",
+  description:
+    "error means the page does not match the type. warning is for things like textlint findings",
 });
 export type Severity = Static<typeof Severity>;
 
 export const Suggestion = Type.Object(
   {
     message: Type.String({
-      description: "直し方の説明 (例: 「2.1 は『目的』です。『背景』は 2.2 です」)",
+      description:
+        "Explanation of the fix (e.g. \"Section 2.1 is 'Purpose'. 'Background' is 2.2\")",
     }),
     replacement: Type.Optional(
-      Type.String({ description: "置き換える文字列が決まるときはその文字列" }),
+      Type.String({ description: "The replacement text, when it is known" }),
     ),
   },
-  { additionalProperties: false, description: "直し方の候補" },
+  { additionalProperties: false, description: "Candidate fix" },
 );
 export type Suggestion = Static<typeof Suggestion>;
 
 export const Violation = Type.Object(
   {
-    pageId: Type.String({ description: "ページ ID" }),
+    pageId: Type.String({ description: "Page ID" }),
     blockId: Type.Unsafe<string | null>({
       type: ["string", "null"],
-      description: "ブロック ID。プロパティの違反や、ブロックがないことの違反では null",
+      description:
+        "Block ID. null for property violations and for violations about a missing block",
     }),
     path: Type.String({
-      description: "型のどこに対応するか (例: body[1]、body[1].children[0]、properties.参加者)",
+      description:
+        "Where in the type it applies (e.g. body[1], body[1].children[0], properties.Attendees)",
     }),
     rule: Type.String({
       description:
-        "違反の種類 (例: property.min、body.missing、body.order、numbering.sequence、textlint/<ルール名>)",
+        "Kind of violation (e.g. property.min, body.missing, body.order, numbering.sequence, textlint/<rule name>)",
     }),
     severity: Severity,
     message: Type.String(),
     suggestions: Type.Array(Suggestion),
-    url: Type.Optional(Type.String({ description: "違反箇所への Notion のリンク" })),
+    url: Type.Optional(Type.String({ description: "Notion link to the violation" })),
   },
   { additionalProperties: false },
 );
@@ -52,7 +56,7 @@ export const PageResult = Type.Object(
     pageId: Type.String(),
     url: Type.String(),
     title: Type.Optional(Type.String()),
-    typeName: Type.Optional(Type.String({ description: "当てた型の name" })),
+    typeName: Type.Optional(Type.String({ description: "name of the type that was applied" })),
     violations: Type.Array(Violation),
   },
   { additionalProperties: false },
@@ -61,7 +65,7 @@ export type PageResult = Static<typeof PageResult>;
 
 export const CheckResult = Type.Object(
   {
-    ok: Type.Boolean({ description: "違反が 1 つもなければ true (終了コード 0)" }),
+    ok: Type.Boolean({ description: "true if there are no violations (exit code 0)" }),
     summary: Type.Object(
       {
         pages: Type.Integer({ minimum: 0 }),
@@ -73,15 +77,17 @@ export const CheckResult = Type.Object(
     ),
     pages: Type.Array(PageResult),
   },
-  { additionalProperties: false, description: "検査の結果 (終了コード 0 または 1)" },
+  { additionalProperties: false, description: "Check result (exit code 0 or 1)" },
 );
 export type CheckResult = Static<typeof CheckResult>;
 
 export const ConfigIssueSchema = Type.Object(
   {
-    path: Type.String({ description: "読みやすい位置 (例: type.body[1].heading)。ルートは空文字" }),
-    pointer: Type.String({ description: "JSON Pointer (例: /type/body/1/heading)" }),
-    keyword: Type.String({ description: "合わなかった JSON Schema のキーワード" }),
+    path: Type.String({
+      description: "Readable location (e.g. type.body[1].heading). Empty string for the root",
+    }),
+    pointer: Type.String({ description: "JSON Pointer (e.g. /type/body/1/heading)" }),
+    keyword: Type.String({ description: "JSON Schema keyword that did not match" }),
     message: Type.String(),
     params: Type.Optional(Type.Record(Type.String(), Type.Unknown())),
   },
@@ -98,28 +104,30 @@ export const ErrorResult = Type.Object(
       {
         kind: StringEnum(ERROR_KINDS, {
           description:
-            "usage: 引数の誤り、config: 設定の読み込みや Schema の不一致、api: Notion API のエラー、internal: その他",
+            "usage: invalid arguments, config: config loading or schema mismatch, api: Notion API error, internal: other",
         }),
-        code: Type.Optional(Type.String({ description: "細かい種類 (例: not_implemented)" })),
+        code: Type.Optional(Type.String({ description: "Finer kind (e.g. not_implemented)" })),
         message: Type.String(),
         source: Type.Optional(
-          Type.String({ description: "設定の出どころ (ファイルのパス、stdin、--config-json)" }),
+          Type.String({
+            description: "Where the config came from (file path, stdin, --config-json)",
+          }),
         ),
         issues: Type.Optional(
-          Type.Array(ConfigIssueSchema, { description: "Schema に合わなかった項目" }),
+          Type.Array(ConfigIssueSchema, { description: "Fields that did not match the schema" }),
         ),
       },
       { additionalProperties: false },
     ),
   },
-  { additionalProperties: false, description: "設定エラーや API エラー (終了コード 2)" },
+  { additionalProperties: false, description: "Config or API error (exit code 2)" },
 );
 export type ErrorResult = Static<typeof ErrorResult>;
 
 export const ResultSchema = KeyedUnion(["summary", "error"], [CheckResult, ErrorResult], {
   $schema: "http://json-schema.org/draft-07/schema#",
   title: "notion-lint result",
-  description: "notion-lint check --format json の出力",
+  description: "Output of notion-lint check --format json",
 });
 export type Result = Static<typeof ResultSchema>;
 

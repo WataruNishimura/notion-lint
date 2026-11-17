@@ -44,53 +44,53 @@ export function validateConfig(data: unknown): ValidationResult {
 // error formatting
 
 const TYPE_NAMES: Record<string, string> = {
-  string: "文字列",
-  object: "オブジェクト",
-  array: "配列",
-  number: "数値",
-  integer: "整数",
-  boolean: "真偽値",
+  string: "a string",
+  object: "an object",
+  array: "an array",
+  number: "a number",
+  integer: "an integer",
+  boolean: "a boolean",
   null: "null",
 };
 
 function describeTypes(types: unknown): string {
   const list = Array.isArray(types) ? types : String(types).split(",");
-  return list.map((t) => TYPE_NAMES[String(t)] ?? String(t)).join("か");
+  return list.map((t) => TYPE_NAMES[String(t)] ?? String(t)).join(" or ");
 }
 
 function messageFor(error: ErrorObject): string {
   const p = error.params as Record<string, unknown>;
   switch (error.keyword) {
     case "required":
-      return `必須の項目 "${p.missingProperty}" がありません`;
+      return `required property "${p.missingProperty}" is missing`;
     case "additionalProperties":
-      return `不明な項目 "${p.additionalProperty}" です`;
+      return `unknown property "${p.additionalProperty}"`;
     case "type":
-      return `${describeTypes(p.type)}である必要があります`;
+      return `must be ${describeTypes(p.type)}`;
     case "enum":
-      return `次のどれかである必要があります: ${(p.allowedValues as unknown[]).map((v) => JSON.stringify(v)).join(", ")}`;
+      return `must be one of: ${(p.allowedValues as unknown[]).map((v) => JSON.stringify(v)).join(", ")}`;
     case "const":
-      return `${JSON.stringify(p.allowedValue)} である必要があります`;
+      return `must be ${JSON.stringify(p.allowedValue)}`;
     case "minimum":
-      return `${p.limit} 以上である必要があります`;
+      return `must be ${p.limit} or more`;
     case "maximum":
-      return `${p.limit} 以下である必要があります`;
+      return `must be ${p.limit} or less`;
     case "minItems":
-      return `${p.limit} 個以上必要です`;
+      return `needs at least ${p.limit} item(s)`;
     case "minLength":
-      return p.limit === 1 ? "空にできません" : `${p.limit} 文字以上必要です`;
+      return p.limit === 1 ? "must not be empty" : `needs at least ${p.limit} character(s)`;
     case "minProperties":
-      return `項目が ${p.limit} つ以上必要です`;
+      return `needs at least ${p.limit} property(ies)`;
     case "uniqueItems":
-      return `重複があります (${p.j} 番目と ${p.i} 番目)`;
+      return `has duplicates (item ${p.j} and item ${p.i})`;
     case "pattern":
-      return `正規表現 ${p.pattern} に合う必要があります`;
+      return `must match the regular expression ${p.pattern}`;
     case "format":
       return p.format === "regex"
-        ? "正規表現として読めません"
-        : `${p.format} の形式である必要があります`;
+        ? "is not a valid regular expression"
+        : `must be in ${p.format} format`;
     case "dependencies":
-      return `"${p.property}" を書くときは "${p.missingProperty}" も必要です`;
+      return `"${p.property}" requires "${p.missingProperty}" as well`;
     default:
       return error.message ?? error.keyword;
   }
@@ -142,7 +142,7 @@ export function toIssues(errors: ErrorObject[]): ConfigIssue[] {
       path: pointerToPath(error.instancePath),
       pointer: error.instancePath,
       keyword: "anyOf",
-      message: `次のどれかが必要です: ${names.map((n) => `"${n}"`).join(", ")}`,
+      message: `one of these is required: ${names.map((n) => `"${n}"`).join(", ")}`,
       params: { required: names },
     });
   }

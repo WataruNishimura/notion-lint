@@ -75,7 +75,7 @@ export async function loadConfig(source: ConfigSource, options: LoadOptions): Pr
     return {
       ok: false,
       source: label,
-      message: `設定が JSON Schema に合いません (${result.issues.length} 件)。notion-lint schema で Schema を確認できます`,
+      message: `The config does not match the JSON Schema (${result.issues.length} issue(s)). Run notion-lint schema to see the schema`,
       issues: result.issues,
     };
   }
@@ -85,7 +85,7 @@ export async function loadConfig(source: ConfigSource, options: LoadOptions): Pr
 async function readSource(source: ConfigSource, options: LoadOptions): Promise<unknown> {
   switch (source.kind) {
     case "stdin":
-      return parseJson(await options.readStdin(), "標準入力");
+      return parseJson(await options.readStdin(), "standard input");
     case "inline":
       return parseJson(source.json, "--config-json");
     case "file": {
@@ -96,7 +96,7 @@ async function readSource(source: ConfigSource, options: LoadOptions): Promise<u
       }
       if (CODE_EXTENSIONS.has(ext)) return importConfigModule(file);
       throw new Error(
-        `設定ファイルの拡張子 ${ext || "(なし)"} は扱えません (.ts / .mts / .js / .mjs / .json)`,
+        `Unsupported config file extension ${ext || "(none)"} (use .ts / .mts / .js / .mjs / .json)`,
       );
     }
   }
@@ -107,18 +107,18 @@ async function readFileOrThrow(file: string): Promise<string> {
     return await readFile(file, "utf8");
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-      throw new Error(`設定ファイルがありません: ${file}`);
+      throw new Error(`Config file not found: ${file}`);
     }
     throw error;
   }
 }
 
 function parseJson(text: string, where: string): unknown {
-  if (text.trim() === "") throw new Error(`${where}が空です。設定の JSON を渡してください`);
+  if (text.trim() === "") throw new Error(`${where} is empty. Pass the config as JSON`);
   try {
     return JSON.parse(text);
   } catch (error) {
-    throw new Error(`${where}を JSON として読めません: ${errorMessage(error)}`);
+    throw new Error(`Cannot read ${where} as JSON: ${errorMessage(error)}`);
   }
 }
 
@@ -133,7 +133,7 @@ function selfEntry(): string {
 }
 
 async function importConfigModule(file: string): Promise<unknown> {
-  if (!existsSync(file)) throw new Error(`設定ファイルがありません: ${file}`);
+  if (!existsSync(file)) throw new Error(`Config file not found: ${file}`);
   const jiti = createJiti(import.meta.url, {
     fsCache: false,
     moduleCache: false,
@@ -144,16 +144,16 @@ async function importConfigModule(file: string): Promise<unknown> {
   try {
     exported = await jiti.import(file, { default: true });
   } catch (error) {
-    throw new Error(`設定ファイルを読み込めません (${file}): ${errorMessage(error)}`);
+    throw new Error(`Cannot load config file (${file}): ${errorMessage(error)}`);
   }
   if (exported === undefined) {
-    throw new Error(`設定ファイルに default export がありません: ${file}`);
+    throw new Error(`Config file has no default export: ${file}`);
   }
   try {
     return toData(exported);
   } catch (error) {
     if (error instanceof ConfigDataError) {
-      throw new Error(`設定ファイルの値を JSON にできません: ${error.message}`);
+      throw new Error(`The config value cannot be converted to JSON: ${error.message}`);
     }
     throw error;
   }

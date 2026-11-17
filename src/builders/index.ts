@@ -175,7 +175,7 @@ function heading(level: HeadingLevel) {
   };
 }
 
-/** Headings. `h.h2("目的")`, `h.h2(/^決定事項/, { children: block.list() })` */
+/** Headings. `h.h2("Purpose")`, `h.h2(/^Decisions/, { children: block.list() })` */
 export const h = { h1: heading(1), h2: heading(2), h3: heading(3) };
 
 export class BlockBuilder implements Buildable<BlockNode> {
@@ -259,7 +259,7 @@ export function numbering(rule: NumberingRule): NumberingRule {
 }
 
 export interface ReferencesOptions {
-  /** Templates with `{n}` / `{title}` (`"{n}章"`), or regexps with named groups `n` / `title`. */
+  /** Templates with `{n}` / `{title}` (`"see section {n}"`), or regexps with named groups `n` / `title`. */
   patterns: readonly (string | RegExp)[];
   notionLinks?: boolean;
   ignore?: readonly (string | RegExp)[];

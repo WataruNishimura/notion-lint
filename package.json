@@ -1,7 +1,7 @@
 {
   "name": "notion-lint",
   "version": "0.0.0",
-  "description": "Notion のページが、設定に書いた文書の「型」に合っているかを検証する CLI",
+  "description": "A CLI that checks whether Notion pages match the document types written in your config",
   "license": "UNLICENSED",
   "private": true,
   "type": "module",
