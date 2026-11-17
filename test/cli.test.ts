@@ -173,7 +173,7 @@ describe("notion-lint check", () => {
     expect(result.stderr).toContain("✖ type.properties.参加者.min");
   });
 
-  it("accepts --page and --format json, then reports that checking is not implemented yet", async () => {
+  it("accepts --page and --format json, then needs NOTION_TOKEN to fetch the page", async () => {
     const result = await runCli(
       [
         "--config",
@@ -188,7 +188,7 @@ describe("notion-lint check", () => {
     expect(result.code).toBe(2);
     expect(parse(result.stdout)).toMatchObject({
       ok: false,
-      error: { kind: "internal", code: "not_implemented", source: "stdin" },
+      error: { kind: "api", code: "missing_token", source: "stdin" },
     });
   });
 

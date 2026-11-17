@@ -3,7 +3,6 @@ import { KeyedUnion, StringEnum } from "./helpers.js";
 
 /**
  * Output of `notion-lint check --format json` (`notion-lint schema result`).
- * Only the format is defined here; fetching pages and validating them come later.
  */
 
 export const Severity = StringEnum(["error", "warning"] as const, {
@@ -63,6 +62,22 @@ export const PageResult = Type.Object(
 );
 export type PageResult = Static<typeof PageResult>;
 
+export const Note = Type.Object(
+  {
+    rule: Type.String({ description: "Kind of note (e.g. skipped)" }),
+    path: Type.String({
+      description: "Where in the config it applies (e.g. targets[0].type.numbering)",
+    }),
+    message: Type.String(),
+  },
+  {
+    additionalProperties: false,
+    description:
+      "Information that is not a violation, such as a part of a type that this version does not check yet. Does not affect ok or the exit code",
+  },
+);
+export type Note = Static<typeof Note>;
+
 export const CheckResult = Type.Object(
   {
     ok: Type.Boolean({ description: "true if there are no violations (exit code 0)" }),
@@ -76,6 +91,7 @@ export const CheckResult = Type.Object(
       { additionalProperties: false },
     ),
     pages: Type.Array(PageResult),
+    notes: Type.Array(Note),
   },
   { additionalProperties: false, description: "Check result (exit code 0 or 1)" },
 );

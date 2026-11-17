@@ -29,7 +29,8 @@
         "required": [
           "ok",
           "summary",
-          "pages"
+          "pages",
+          "notes"
         ],
         "properties": {
           "ok": {
@@ -160,6 +161,32 @@
                       }
                     }
                   }
+                }
+              }
+            }
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "description": "Information that is not a violation, such as a part of a type that this version does not check yet. Does not affect ok or the exit code",
+              "type": "object",
+              "required": [
+                "rule",
+                "path",
+                "message"
+              ],
+              "properties": {
+                "rule": {
+                  "description": "Kind of note (e.g. skipped)",
+                  "type": "string"
+                },
+                "path": {
+                  "description": "Where in the config it applies (e.g. targets[0].type.numbering)",
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
                 }
               }
             }
