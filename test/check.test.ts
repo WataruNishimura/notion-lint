@@ -171,7 +171,6 @@ describe("notion-lint check", () => {
       body: [{ heading: 2, title: "目的" }],
       numbering: { format: { h2: "{n}. {title}" } },
       references: { patterns: ["see section {n}"] },
-      text: { textlint: { presets: ["ja-technical-writing"] } },
     };
     const result = await checkCli(["--page", pageOk, "--format", "json"], {
       config: JSON.stringify({ type }),
@@ -180,7 +179,6 @@ describe("notion-lint check", () => {
     expect(parseResult(result.stdout).notes).toEqual([
       expect.objectContaining({ rule: "skipped", path: "type.numbering" }),
       expect.objectContaining({ rule: "skipped", path: "type.references" }),
-      expect.objectContaining({ rule: "skipped", path: "type.text" }),
     ]);
 
     const text = await checkCli(["--page", pageOk], { config: JSON.stringify({ type }) });

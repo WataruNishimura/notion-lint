@@ -1,0 +1,8 @@
+version: 1
+rules:
+  - expected: ユーザー
+    pattern: /ユーザ(?!ー)/
+    prh: 語尾の長音を付けて「ユーザー」と書く
+  - expected: できる
+    pattern: 出来る
+    prh: 補助的な意味の動詞はひらがなで書く

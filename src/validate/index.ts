@@ -18,7 +18,11 @@ export function checkPage(page: PageModel, type: DocType): Finding[] {
 
 /** Whether matching needs the page's blocks (fetching them costs requests). */
 export function needsBody(type: DocType): boolean {
-  return type.body !== undefined || type.headings?.noSkipLevel === true;
+  return (
+    type.body !== undefined ||
+    type.headings?.noSkipLevel === true ||
+    type.text?.textlint !== undefined
+  );
 }
 
 /**
@@ -38,7 +42,6 @@ export function skippedParts(type: DocType, typePath: string): Note[] {
   };
   skip("numbering", "numbering (section numbers)");
   skip("references", "references (section references)");
-  skip("text", "text (textlint)");
   if (type.fromTemplate !== undefined) {
     notes.push({
       rule: "skipped",
