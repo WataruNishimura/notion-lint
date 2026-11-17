@@ -1,4 +1,6 @@
-import { Client } from "@notionhq/client";
+// @notionhq/client is CommonJS. Node 22 cannot see its named exports from ESM, so take the
+// whole module.exports object as the default import.
+import notionClient from "@notionhq/client";
 
 /**
  * The Notion API version notion-lint is written against. From 2025-09-03, databases are
@@ -41,7 +43,7 @@ export interface NotionApi {
  * because `NotionFetcher` retries (with a bound and Retry-After) and rate-limits itself.
  */
 export function createNotionApi(token: string): NotionApi {
-  const client = new Client({
+  const client = new notionClient.Client({
     auth: token,
     notionVersion: NOTION_VERSION,
     retry: false,
