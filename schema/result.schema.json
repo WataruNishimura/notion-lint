@@ -1,0 +1,261 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "notion-lint result",
+  "description": "Output of notion-lint check --format json",
+  "type": "object",
+  "anyOf": [
+    {
+      "required": [
+        "summary"
+      ]
+    },
+    {
+      "required": [
+        "error"
+      ]
+    }
+  ],
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "summary"
+        ]
+      },
+      "then": {
+        "additionalProperties": false,
+        "description": "Check result (exit code 0 or 1)",
+        "type": "object",
+        "required": [
+          "ok",
+          "summary",
+          "pages"
+        ],
+        "properties": {
+          "ok": {
+            "description": "true if there are no violations (exit code 0)",
+            "type": "boolean"
+          },
+          "summary": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "pages",
+              "violations",
+              "errors",
+              "warnings"
+            ],
+            "properties": {
+              "pages": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "violations": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "errors": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "warnings": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            }
+          },
+          "pages": {
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "pageId",
+                "url",
+                "violations"
+              ],
+              "properties": {
+                "pageId": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "typeName": {
+                  "description": "name of the type that was applied",
+                  "type": "string"
+                },
+                "violations": {
+                  "type": "array",
+                  "items": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "pageId",
+                      "blockId",
+                      "path",
+                      "rule",
+                      "severity",
+                      "message",
+                      "suggestions"
+                    ],
+                    "properties": {
+                      "pageId": {
+                        "description": "Page ID",
+                        "type": "string"
+                      },
+                      "blockId": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "description": "Block ID. null for property violations and for violations about a missing block"
+                      },
+                      "path": {
+                        "description": "Where in the type it applies (e.g. body[1], body[1].children[0], properties.Attendees)",
+                        "type": "string"
+                      },
+                      "rule": {
+                        "description": "Kind of violation (e.g. property.min, body.missing, body.order, numbering.sequence, textlint/<rule name>)",
+                        "type": "string"
+                      },
+                      "severity": {
+                        "description": "error means the page does not match the type. warning is for things like textlint findings",
+                        "type": "string",
+                        "enum": [
+                          "error",
+                          "warning"
+                        ]
+                      },
+                      "message": {
+                        "type": "string"
+                      },
+                      "suggestions": {
+                        "type": "array",
+                        "items": {
+                          "additionalProperties": false,
+                          "description": "Candidate fix",
+                          "type": "object",
+                          "required": [
+                            "message"
+                          ],
+                          "properties": {
+                            "message": {
+                              "description": "Explanation of the fix (e.g. \"Section 2.1 is 'Purpose'. 'Background' is 2.2\")",
+                              "type": "string"
+                            },
+                            "replacement": {
+                              "description": "The replacement text, when it is known",
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "url": {
+                        "description": "Notion link to the violation",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "error"
+        ]
+      },
+      "then": {
+        "additionalProperties": false,
+        "description": "Config or API error (exit code 2)",
+        "type": "object",
+        "required": [
+          "ok",
+          "error"
+        ],
+        "properties": {
+          "ok": {
+            "const": false,
+            "type": "boolean"
+          },
+          "error": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "kind",
+              "message"
+            ],
+            "properties": {
+              "kind": {
+                "description": "usage: invalid arguments, config: config loading or schema mismatch, api: Notion API error, internal: other",
+                "type": "string",
+                "enum": [
+                  "usage",
+                  "config",
+                  "api",
+                  "internal"
+                ]
+              },
+              "code": {
+                "description": "Finer kind (e.g. not_implemented)",
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "source": {
+                "description": "Where the config came from (file path, stdin, --config-json)",
+                "type": "string"
+              },
+              "issues": {
+                "description": "Fields that did not match the schema",
+                "type": "array",
+                "items": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "path",
+                    "pointer",
+                    "keyword",
+                    "message"
+                  ],
+                  "properties": {
+                    "path": {
+                      "description": "Readable location (e.g. type.body[1].heading). Empty string for the root",
+                      "type": "string"
+                    },
+                    "pointer": {
+                      "description": "JSON Pointer (e.g. /type/body/1/heading)",
+                      "type": "string"
+                    },
+                    "keyword": {
+                      "description": "JSON Schema keyword that did not match",
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "params": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^(.*)$": {}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
