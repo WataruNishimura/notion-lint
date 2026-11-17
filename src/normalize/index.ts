@@ -166,9 +166,7 @@ const NOTION_HOSTS = /(^|\.)notion\.(so|site|com)$/i;
  * or the relative form the API uses for links inside a workspace (`/<page id>#<block id>`).
  * Undefined for other URLs.
  */
-export function notionTarget(
-  url: string,
-): { pageId: string; blockId: string | null } | undefined {
+export function notionTarget(url: string): { pageId: string; blockId: string | null } | undefined {
   let parsed: URL;
   try {
     parsed = new URL(url, "https://www.notion.so");

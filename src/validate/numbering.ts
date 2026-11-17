@@ -16,11 +16,7 @@ import type { Finding } from "./finding.js";
 const escapeRegex = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 /** A literal part of a format: whitespace matches any run of whitespace. */
-const literalSource = (text: string): string =>
-  text
-    .split(/\s+/)
-    .map(escapeRegex)
-    .join("\\s+");
+const literalSource = (text: string): string => text.split(/\s+/).map(escapeRegex).join("\\s+");
 
 /** One level's `format`, compiled. */
 export class HeadingFormat {
@@ -60,17 +56,13 @@ export class HeadingFormat {
     const last = this.format.lastIndexOf("{n}");
     if (first === -1) return "";
     let i = 0;
-    return this.format
-      .slice(first, last + 3)
-      .replace(/\{n\}/g, () => String(parts[i++] ?? "?"));
+    return this.format.slice(first, last + 3).replace(/\{n\}/g, () => String(parts[i++] ?? "?"));
   }
 
   /** A full heading text in this format. */
   render(parts: readonly number[], title: string): string {
     let i = 0;
-    return this.format
-      .replace(/\{n\}/g, () => String(parts[i++] ?? "?"))
-      .replace("{title}", title);
+    return this.format.replace(/\{n\}/g, () => String(parts[i++] ?? "?")).replace("{title}", title);
   }
 
   /** Text between consecutive `{n}` (e.g. "." in "{n}.{n} {title}"). */

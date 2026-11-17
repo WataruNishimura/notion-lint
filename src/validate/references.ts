@@ -1,4 +1,10 @@
-import type { BlockItem, BodyItem, HeadingItem, NotionLink, PageModel } from "../normalize/model.js";
+import type {
+  BlockItem,
+  BodyItem,
+  HeadingItem,
+  NotionLink,
+  PageModel,
+} from "../normalize/model.js";
 import { joinPath } from "../path.js";
 import type { NumberingRule, ReferencesRule } from "../schema/config.js";
 import type { Regex } from "../schema/helpers.js";
@@ -131,10 +137,7 @@ export function compileTemplate(template: string, titles: string[], number: stri
       seenTitle = true;
       return;
     }
-    source += token
-      .split(/\s+/)
-      .map(escapeRegex)
-      .join("\\s+");
+    source += token.split(/\s+/).map(escapeRegex).join("\\s+");
   });
   return new RegExp(source, "dgiu");
 }
@@ -396,7 +399,10 @@ function checkSamePageLinks(
         rule: "references.link",
         message: `link "${link.text}" points to the heading "${target.item.text}"`,
         suggestions: [
-          { message: `Change the link text to "${target.item.text}"`, replacement: target.item.text },
+          {
+            message: `Change the link text to "${target.item.text}"`,
+            replacement: target.item.text,
+          },
         ],
         blockId: block.id,
       });
@@ -412,7 +418,7 @@ function staleLinkText(
 ): boolean {
   const text = link.text.trim();
   if (text === target.item.text || text === target.title) return false;
-  const numbered = /^\s*(\d+(?:[.\-]\d+)*)[.:)]?(?:\s+(.*))?$/su.exec(text);
+  const numbered = /^\s*(\d+(?:[.-]\d+)*)[.:)]?(?:\s+(.*))?$/su.exec(text);
   if (numbered !== null) {
     const rest = (numbered[2] ?? "").trim();
     return (

@@ -9,6 +9,8 @@ export interface CheckDeps {
   env?: Record<string, string | undefined>;
   /** Builds the fetcher from the token. Defaults to the real Notion API. */
   createFetcher?: (token: string) => PageFetcher;
+  /** Directory that textlint presets and prh dictionary paths resolve from. Defaults to the current directory. */
+  baseDir?: string;
 }
 
 const defaultFetcher = (token: string): PageFetcher => new NotionFetcher(createNotionApi(token));
@@ -38,7 +40,11 @@ export async function check(
       };
     }
     const fetcher = (deps.createFetcher ?? defaultFetcher)(token);
-    return await runCheck(plans, fetcher);
+    return await runCheck(
+      plans,
+      fetcher,
+      deps.baseDir === undefined ? {} : { baseDir: deps.baseDir },
+    );
   } catch (error) {
     const result = toErrorResult(error);
     if (result === undefined) throw error;

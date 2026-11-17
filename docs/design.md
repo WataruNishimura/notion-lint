@@ -162,6 +162,16 @@ config load → fetch (Notion API) → normalize (internal representation) → m
   - If the type also has a `body`, that `body` replaces the template's (no merge) and the template is not fetched.
   - Each template page is fetched once per run, however many targets use it. A template that cannot be read is an API error (exit code 2); an invalid template page ID is a config error (exit code 2).
 
+## Linting the body text
+
+Implemented in `src/text`. The body is converted to Markdown with a source map from Markdown lines to block IDs, and the textlint kernel runs on it. Differences from the plan above:
+
+- `rule` is textlint's own rule ID (`ja-technical-writing/ja-no-weak-phrase`, `prh`), without a `textlint/` prefix, and `path` is `body > <heading> > ...` as in the example output.
+- The message is textlint's message followed by `(<rule ID>)`, so the text format shows the rule.
+- Severity is `warning` unless the rule is configured with `severity: "error"`; warnings count as violations.
+- Presets and prh paths resolve from the config file's directory (the current directory for JSON configs), then from notion-lint's own dependencies. A missing one is a config error (exit code 2), reported before any page is fetched.
+- Code, equations, tables and dividers are not linted; only each block's plain text is known.
+
 ## Matching section numbers and references
 
 Notion headings have no automatic section numbers, so the numbers are assumed to be typed by hand in the heading text and are checked on that basis.

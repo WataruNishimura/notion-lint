@@ -1,3 +1,4 @@
+import path from "node:path";
 import { parseArgs } from "node:util";
 import { agentCommand } from "./agent/command.js";
 import { check } from "./check/command.js";
@@ -249,7 +250,11 @@ async function checkCommand(args: string[], io: Io): Promise<ExitCode> {
   const load = await loadConfig(options.source, { cwd: io.cwd, readStdin: io.readStdin });
   if (!load.ok) return writeError(io, loadError(load), channel);
 
-  const result = await check(load.config, options.pages, io);
+  const baseDir =
+    options.source.kind === "file"
+      ? path.dirname(path.resolve(io.cwd, options.source.path))
+      : io.cwd;
+  const result = await check(load.config, options.pages, { ...io, baseDir });
   if ("error" in result) {
     return writeError(io, { ...result, error: { ...result.error, source: load.source } }, channel);
   }
