@@ -4,7 +4,7 @@ A CLI that checks whether Notion pages match the document "types" written in `no
 
 See [docs/design.md](docs/design.md) for the design.
 
-> Currently implemented: loading and validating the config, the `schema` / `print-config` / `agent` commands, and `check` with property and body (heading tree) matching. Section numbers and references (`numbering`, `references`), textlint (`text`), and `fromTemplate` are not checked yet: `check` skips them and reports an info note (see below).
+> Currently implemented: loading and validating the config, the `schema` / `print-config` / `agent` commands, and `check` with property and body (heading tree) matching. `doc.fromTemplate` (the body skeleton is built from a template page's headings). Section numbers and references (`numbering`, `references`) and textlint (`text`) are not checked yet: `check` skips them and reports an info note (see below).
 
 ## `notion-lint check`
 

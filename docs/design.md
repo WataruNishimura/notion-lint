@@ -155,7 +155,12 @@ config load → fetch (Notion API) → normalize (internal representation) → m
 - Build a tree from the page's headings (blocks under a heading are children of that heading).
 - Match the type's `body` array against the page's headings in order, by name. Wrong order, missing, and extra headings are each reported as separate violations.
 - Heading names are matched exactly by default, but regular expressions are also allowed, such as `h.h2(/^Decisions/)`.
-- `doc.fromTemplate` fetches the template page and generates a `body` of the same shape automatically. Changing the template changes the type too.
+- `doc.fromTemplate` fetches the template page and generates a `body` of the same shape automatically. Changing the template changes the type too. How the skeleton is built (implemented):
+  - Only the template's headings become entries: each is a required heading with the template's level and exact text (a section number in the `numbering` format is stripped). Sub-headings become `children`, so the nesting is checked too. Paragraphs, lists, and other blocks in a template are placeholder content, so they produce no block entries (write `body` yourself if a section needs, say, a list).
+  - No entry is optional. A heading gets `children` only when the template has sub-headings under it, so `headings.allowExtra: false` forbids extra headings at the top level and under such headings only. Headings deeper than H3, empty headings, and headings nested in other blocks (toggles, columns) are ignored.
+  - `properties`, `headings`, and the other settings of the type apply as written, together with the template-derived body. Properties of the template page itself are not used.
+  - If the type also has a `body`, that `body` replaces the template's (no merge) and the template is not fetched.
+  - Each template page is fetched once per run, however many targets use it. A template that cannot be read is an API error (exit code 2); an invalid template page ID is a config error (exit code 2).
 
 ## Matching section numbers and references
 

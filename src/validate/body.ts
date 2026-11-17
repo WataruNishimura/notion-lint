@@ -211,7 +211,9 @@ function describeTitle(title: string | Regex): string {
  * a section number written in the heading's format is removed first ("1.2 Background" ->
  * "Background"). Checking the numbers themselves is not implemented yet.
  */
-function titleReader(numbering: NumberingRule | undefined): (heading: HeadingItem) => string {
+export function titleReader(
+  numbering: NumberingRule | undefined,
+): (heading: HeadingItem) => string {
   const formats = new Map<number, RegExp>();
   for (const [key, format] of Object.entries(numbering?.format ?? {})) {
     if (format === undefined) continue;
