@@ -19,6 +19,9 @@ export interface PageModel {
 export type TextPropertyType = "title" | "rich_text" | "url" | "email" | "phone_number";
 export type CountPropertyType = "people" | "files" | "relation";
 
+/** The result type of a formula (`formula.type` in the API). */
+export type FormulaResult = "string" | "number" | "boolean" | "date";
+
 export type PropertyValue =
   | { type: TextPropertyType; text: string }
   | { type: "number"; value: number | null }
@@ -31,9 +34,30 @@ export type PropertyValue =
    * holds 25 items at most, so `count` and `ids` are partial. `check` completes pages before
    * matching them.
    */
-  | { type: CountPropertyType; count: number; hasMore: boolean; ids?: string[] }
+  | {
+      type: CountPropertyType;
+      count: number;
+      hasMore: boolean;
+      ids?: string[];
+      /** File names (files only). */
+      names?: string[];
+    }
+  /**
+   * A formula result. `value` is the text, number, boolean, or date start (an ISO string),
+   * and null when the formula has no value. `result` is null for a result type not listed.
+   */
+  | { type: "formula"; result: FormulaResult | null; value: string | number | boolean | null }
+  /**
+   * A rollup result: a number, a date start, or an array of property values. `hasMore` is
+   * true for an array of 25 items or more, which the page object may have cut short.
+   * `incomplete` covers the API's `incomplete` and `unsupported` rollups.
+   */
+  | { type: "rollup"; result: "number"; value: number | null }
+  | { type: "rollup"; result: "date"; value: string | null }
+  | { type: "rollup"; result: "array"; items: PropertyValue[]; hasMore: boolean }
+  | { type: "rollup"; result: "incomplete" }
   | { type: "checkbox"; checked: boolean }
-  /** Property types that types cannot describe (formula, rollup, created_time, ...). */
+  /** Property types that types cannot describe (created_time, ...). */
   | { type: "unsupported"; apiType: string };
 
 export interface HeadingItem {

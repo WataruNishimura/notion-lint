@@ -1,6 +1,6 @@
 import type { RawBlockTree } from "../notion/fetch.js";
 import { parseNotionId } from "../notion/id.js";
-import { mayBeTruncated } from "../notion/long-values.js";
+import { mayBeTruncated, PAGE_OBJECT_LIMIT } from "../notion/long-values.js";
 import type { BodyItem, HeadingItem, NotionLink, PageModel, PropertyValue } from "./model.js";
 
 /**
@@ -80,11 +80,70 @@ export function normalizeProperty(raw: Json): PropertyValue {
           .map((id) => parseNotionId(id) ?? id),
       };
     case "files":
-      return { type, count: array(value).length, hasMore: mayBeTruncated(raw) };
+      return {
+        type,
+        count: array(value).length,
+        hasMore: mayBeTruncated(raw),
+        names: array(value)
+          .map((item) => str(record(item).name))
+          .filter((name): name is string => name !== null),
+      };
+    case "formula":
+      return normalizeFormula(record(value));
+    case "rollup":
+      return normalizeRollup(record(value));
     case "checkbox":
       return { type, checked: value === true };
     default:
       return { type: "unsupported", apiType: type };
+  }
+}
+
+function normalizeFormula(formula: Json): PropertyValue {
+  const result = str(formula.type);
+  switch (result) {
+    case "string":
+      return { type: "formula", result, value: str(formula.string) };
+    case "number":
+      return {
+        type: "formula",
+        result,
+        value: typeof formula.number === "number" ? formula.number : null,
+      };
+    case "boolean":
+      return {
+        type: "formula",
+        result,
+        value: typeof formula.boolean === "boolean" ? formula.boolean : null,
+      };
+    case "date":
+      return { type: "formula", result, value: str(record(formula.date).start) };
+    default:
+      return { type: "formula", result: null, value: null };
+  }
+}
+
+function normalizeRollup(rollup: Json): PropertyValue {
+  switch (str(rollup.type)) {
+    case "number":
+      return {
+        type: "rollup",
+        result: "number",
+        value: typeof rollup.number === "number" ? rollup.number : null,
+      };
+    case "date":
+      return { type: "rollup", result: "date", value: str(record(rollup.date).start) };
+    case "array": {
+      const items = array(rollup.array);
+      return {
+        type: "rollup",
+        result: "array",
+        items: items.map((item) => normalizeProperty(record(item))),
+        hasMore: items.length >= PAGE_OBJECT_LIMIT,
+      };
+    }
+    default:
+      return { type: "rollup", result: "incomplete" };
   }
 }
 
