@@ -10,6 +10,13 @@ workflow copies the section whose heading starts with the tag's version into the
 
 ## Unreleased
 
+### Added
+
+- `where` on formula, rollup and files properties, sent to Notion as a query filter where the
+  result type is known and always checked locally too.
+- `dataSource` accepts a database ID or URL. A database with one data source is resolved; with
+  several, the run exits with code 2 and lists their names and IDs.
+
 ## 0.1.0 - 2026-11-18
 
 First release.
