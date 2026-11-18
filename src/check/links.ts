@@ -3,13 +3,37 @@ import { NotionApiError, type PageFetcher } from "../notion/fetch.js";
 import { joinPath } from "../path.js";
 import type { DocType } from "../schema/config.js";
 import type { Finding } from "../validate/index.js";
-import { outsideLinks } from "../validate/references.js";
+import {
+  checkBlockLink,
+  type LinkTarget,
+  linkTarget,
+  outsideLinks,
+} from "../validate/references.js";
 
 /**
  * With `references.notionLinks`, links to other pages (page mentions, links to pages or to
  * blocks on them, `link_to_page` blocks) must point to something that exists and that the
- * integration can read. Only existence is checked: the target's section numbers are not.
+ * integration can read.
+ *
+ * When the target page is also checked in this run, it is not fetched again: it exists, and a
+ * link to a block on it is matched against its headings, numbered by its own type, the way
+ * links on the same page are (`references.link`). Page mentions and links to a page only need
+ * the page to exist, and a checked page whose type needs no body has no headings to match.
  */
+
+/** A page checked in this run, with the type it was checked against. */
+export interface CheckedPage {
+  page: PageModel;
+  type: DocType;
+  /** Whether the blocks were fetched (the type needs them). Without a body there are no headings to match. */
+  hasBody: boolean;
+  target?: LinkTarget;
+}
+
+/** Checked pages by ID (hyphens removed, lowercase). The first type given for a page wins. */
+export type CheckedPages = Map<string, CheckedPage>;
+
+export const checkedKey = (id: string): string => id.replace(/-/g, "").toLowerCase();
 
 /** Target ID -> why it cannot be read (undefined when it can). One request per target per run. */
 export type LinkCache = Map<string, Promise<string | undefined>>;
@@ -22,9 +46,19 @@ export async function checkOutsideLinks(
   type: DocType,
   fetcher: PageFetcher,
   cache: LinkCache,
+  checked: CheckedPages = new Map(),
 ): Promise<Finding[]> {
   const findings: Finding[] = [];
   for (const { link, blockId } of outsideLinks(type.references, page)) {
+    const other = checked.get(checkedKey(link.pageId));
+    if (other !== undefined && (other.hasBody || link.blockId === null)) {
+      if (link.blockId !== null) {
+        other.target ??= linkTarget(other.page, other.type.numbering);
+        const finding = checkBlockLink(link, blockId, other.target, true);
+        if (finding !== undefined) findings.push(finding);
+      }
+      continue;
+    }
     const targetId = link.blockId ?? link.pageId;
     let problem = cache.get(targetId);
     if (problem === undefined) {

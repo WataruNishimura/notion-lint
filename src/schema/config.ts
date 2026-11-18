@@ -287,7 +287,7 @@ export const ReferencesRule = Type.Object(
     notionLinks: Type.Optional(
       Type.Boolean({
         description:
-          "Also check Notion links: a link to a heading on the same page must read as that heading's current number and title, and a link or mention of another page (or a block on it) must point to something that exists and can be read. Default false",
+          "Also check Notion links: a link to a heading on the same page must read as that heading's current number and title, and a link or mention of another page (or a block on it) must point to something that exists and can be read; when that page is also checked in the same run, a link to a heading on it must read as that heading's current number and title too. Default false",
       }),
     ),
     ignore: Type.Optional(

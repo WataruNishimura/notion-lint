@@ -42,7 +42,7 @@ const TEXT_BLOCKS = new Set([
 ]);
 
 /** A heading with its section number (if it has one) and its title. */
-interface IndexedHeading {
+export interface IndexedHeading {
   item: HeadingItem;
   /** Number parts joined with dots ("2.1"); undefined for an unnumbered heading. */
   key: string | undefined;
@@ -355,16 +355,27 @@ function checkReference(
 }
 
 /**
- * Links to blocks on the same page. A link whose text reads like a section reference (it
- * starts with a section number, or is the title of another heading) must name the linked
- * heading's current number and title. Free text such as "here" is not checked.
+ * What a link to a block of a page is checked against: the page's headings (numbered by the
+ * page's own type) and the IDs of all its blocks.
  */
-function checkSamePageLinks(
-  page: PageModel,
-  headings: IndexedHeading[],
-  byTitle: Map<string, IndexedHeading>,
-): Finding[] {
-  const findings: Finding[] = [];
+export interface LinkTarget {
+  page: PageModel;
+  headings: IndexedHeading[];
+  byTitle: Map<string, IndexedHeading>;
+  /** Block IDs, without hyphens, lowercase. */
+  ids: Set<string>;
+}
+
+function headingsByTitle(headings: IndexedHeading[]): Map<string, IndexedHeading> {
+  const byTitle = new Map<string, IndexedHeading>();
+  for (const heading of headings) {
+    if (!byTitle.has(heading.title)) byTitle.set(heading.title, heading);
+    if (!byTitle.has(heading.item.text)) byTitle.set(heading.item.text, heading);
+  }
+  return byTitle;
+}
+
+function blockIds(page: PageModel): Set<string> {
   const ids = new Set<string>();
   const collect = (items: BodyItem[]) => {
     for (const item of items) {
@@ -373,39 +384,73 @@ function checkSamePageLinks(
     }
   };
   collect(page.body);
+  return ids;
+}
 
+/** Index a page as the target of links. `numbering` is the numbering rule of the page's own type. */
+export function linkTarget(page: PageModel, numbering: NumberingRule | undefined): LinkTarget {
+  const headings = indexHeadings(page.body, headingFormats(numbering));
+  return { page, headings, byTitle: headingsByTitle(headings), ids: blockIds(page) };
+}
+
+/**
+ * A link to a block of `target`. A link whose text reads like a section reference (it starts
+ * with a section number, or is the title of another heading) must name the linked heading's
+ * current number and title. Free text such as "here" is not checked. `other` is set when the
+ * target is not the page that holds the link: the messages then name that page.
+ */
+export function checkBlockLink(
+  link: NotionLink,
+  blockId: string,
+  target: LinkTarget,
+  other: boolean,
+): Finding | undefined {
+  if (link.blockId === null) return undefined;
+  const path = joinPath("references", "notionLinks");
+  const on = other ? `the page "${target.page.title}"` : "this page";
+  const heading = target.headings.find((h) => sameId(h.item.id, link.blockId as string));
+  if (heading === undefined) {
+    if (target.ids.has(link.blockId.replace(/-/g, "").toLowerCase())) return undefined;
+    return {
+      path,
+      rule: "references.link",
+      message: `link "${link.text}" points to a block that is no longer on ${on}`,
+      suggestions: [{ message: "Link to the heading again, or remove the link" }],
+      blockId,
+    };
+  }
+  if (link.kind !== "link") return undefined; // Notion keeps the text of mentions up to date.
+  if (!staleLinkText(link, heading, target.byTitle)) return undefined;
+  return {
+    path,
+    rule: "references.link",
+    message: `link "${link.text}" points to the heading "${heading.item.text}"${
+      other ? ` on ${on}` : ""
+    }`,
+    suggestions: [
+      {
+        message: `Change the link text to "${heading.item.text}"`,
+        replacement: heading.item.text,
+      },
+    ],
+    blockId,
+  };
+}
+
+/** Links to blocks on the same page. */
+function checkSamePageLinks(
+  page: PageModel,
+  headings: IndexedHeading[],
+  byTitle: Map<string, IndexedHeading>,
+): Finding[] {
+  const findings: Finding[] = [];
+  const target: LinkTarget = { page, headings, byTitle, ids: blockIds(page) };
   for (const block of blocks(page.body)) {
     if (block.type === "code") continue;
     for (const link of block.links ?? []) {
       if (link.blockId === null || !sameId(link.pageId, page.id)) continue;
-      const path = joinPath("references", "notionLinks");
-      const target = headings.find((h) => sameId(h.item.id, link.blockId as string));
-      if (target === undefined) {
-        if (ids.has(link.blockId.replace(/-/g, "").toLowerCase())) continue;
-        findings.push({
-          path,
-          rule: "references.link",
-          message: `link "${link.text}" points to a block that is no longer on this page`,
-          suggestions: [{ message: "Link to the heading again, or remove the link" }],
-          blockId: block.id,
-        });
-        continue;
-      }
-      if (link.kind !== "link") continue; // Notion keeps the text of mentions up to date.
-      const stale = staleLinkText(link, target, byTitle);
-      if (!stale) continue;
-      findings.push({
-        path,
-        rule: "references.link",
-        message: `link "${link.text}" points to the heading "${target.item.text}"`,
-        suggestions: [
-          {
-            message: `Change the link text to "${target.item.text}"`,
-            replacement: target.item.text,
-          },
-        ],
-        blockId: block.id,
-      });
+      const finding = checkBlockLink(link, block.id, target, false);
+      if (finding !== undefined) findings.push(finding);
     }
   }
   return findings;
