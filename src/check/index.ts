@@ -39,7 +39,7 @@ export class CheckError extends Error {
 
 /** What to check, decided from the arguments and the config before anything is fetched. */
 export type Plan =
-  | { kind: "page"; pageId: string; type: DocType; typePath: string }
+  | { kind: "page"; pageId: string; type: DocType; typePath: string; idPath: string }
   | {
       kind: "dataSource";
       dataSourceId: string;
@@ -61,7 +61,13 @@ export function planCheck(config: Config, pages: string[]): Plan[] {
         "Checking with --page requires a type (the type to apply to the page) in the config",
       );
     }
-    return pages.map((pageId) => ({ kind: "page", pageId, type, typePath: "type" }));
+    return pages.map((pageId) => ({
+      kind: "page",
+      pageId,
+      type,
+      typePath: "type",
+      idPath: "--page",
+    }));
   }
   if (config.targets === undefined) {
     throw new CheckError(
@@ -80,7 +86,13 @@ export function planCheck(config: Config, pages: string[]): Plan[] {
           `${joinPath(base, "page")} is not a Notion page URL or ID: ${target.page}`,
         );
       }
-      return { kind: "page", pageId, type: target.type, typePath };
+      return {
+        kind: "page",
+        pageId,
+        type: target.type,
+        typePath,
+        idPath: joinPath(base, "page"),
+      };
     }
     const dataSourceId = parseNotionId(target.dataSource, { peek: false });
     if (dataSourceId === undefined) {
@@ -128,7 +140,7 @@ export async function runCheck(
     for (const note of skippedParts(plan.type, plan.typePath)) notes.set(note.path, note);
     const rawPages =
       plan.kind === "page"
-        ? [await fetcher.page(plan.pageId)]
+        ? await pageObjects(plan, fetcher, dataSources)
         : await dataSourcePages(plan, fetcher, dataSources);
     // Property lists the type or `where` looks at are read in full (page objects stop at 25).
     const listed = [...Object.keys(plan.type.properties ?? {})];
@@ -264,6 +276,44 @@ function pageResult(page: PageModel, type: DocType, findings: Finding[]): PageRe
     ...(type.name === undefined ? {} : { typeName: type.name }),
     violations,
   };
+}
+
+/**
+ * The page of a `page` target or `--page`. The ID is first read as a page, so a page costs no
+ * extra request. When Notion says there is no such page (404 / 400), it may be a data source or
+ * a database: then every page of it is checked (no `where`), resolved as for a `dataSource`
+ * target. When that fails too, the error for the page is the one reported.
+ */
+async function pageObjects(
+  plan: Extract<Plan, { kind: "page" }>,
+  fetcher: PageFetcher,
+  dataSources: DataSourceResolver,
+): Promise<Record<string, unknown>[]> {
+  try {
+    return [await fetcher.page(plan.pageId)];
+  } catch (error) {
+    if (!(error instanceof NotionApiError && (error.status === 404 || error.status === 400))) {
+      throw error;
+    }
+    try {
+      return await dataSourcePages(
+        {
+          kind: "dataSource",
+          dataSourceId: plan.pageId,
+          where: undefined,
+          type: plan.type,
+          typePath: plan.typePath,
+          wherePath: "",
+          dataSourcePath: plan.idPath,
+        },
+        fetcher,
+        dataSources,
+      );
+    } catch (inner) {
+      if (inner instanceof NotionApiError) throw error;
+      throw inner;
+    }
+  }
 }
 
 /**

@@ -15,7 +15,8 @@ workflow copies the section whose heading starts with the tag's version into the
 - `where` on formula, rollup and files properties, sent to Notion as a query filter where the
   result type is known and always checked locally too.
 - `dataSource` accepts a database ID or URL. A database with one data source is resolved; with
-  several, the run exits with code 2 and lists their names and IDs.
+  several, the run exits with code 2 and lists their names and IDs. `--page` does the same for an
+  ID that is not a page: every page of the database or data source is checked.
 
 ## 0.1.0 - 2026-11-18
 

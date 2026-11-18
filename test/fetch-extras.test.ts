@@ -542,3 +542,70 @@ describe("parseNotionId for databases", () => {
     expect(parseNotionId(`https://www.notion.so/${hex(t.db)}?v=${view}`)).toBe(t.db);
   });
 });
+
+describe("--page with a database or data source", () => {
+  const env = { NOTION_TOKEN: "secret_test_token_value" };
+  // One is clean; Two violates the pattern.
+  const type = { properties: { Name: { type: "title", pattern: "^One" } } };
+  const withPage = (): Recording => {
+    const copy = structuredClone(databases);
+    const list = copy.responses[`POST /v1/data_sources/${t.ds}/query`] as {
+      results: Record<string, unknown>[];
+    }[];
+    const one = list[0]?.results[0] as Record<string, unknown>;
+    copy.responses[`GET /v1/pages/${t.one}`] = one;
+    return copy;
+  };
+
+  async function page(input: string, rec: Recording = withPage()) {
+    const callList: string[] = [];
+    const result = await runCli(
+      ["--config-json", JSON.stringify({ type }), "--page", input, "--format", "json"],
+      { env, createFetcher: () => replayFetcher(rec, callList) },
+    );
+    return { ...result, callList };
+  }
+  const out = (stdout: string) => JSON.parse(stdout) as CheckResult;
+
+  it("keeps a page on the page path, with no extra lookup", async () => {
+    const result = await page(`https://www.notion.so/One-${hex(t.one)}`);
+    expect(result.code).toBe(0);
+    expect(result.callList).toEqual([`GET /v1/pages/${t.one}`]);
+  });
+
+  it("checks every page of a database with one data source", async () => {
+    const result = await page(`https://www.notion.so/team/Tasks-${hex(t.db)}?v=${view}`);
+    expect(result.code).toBe(1);
+    const output = out(result.stdout);
+    expect(output.pages.map((p) => [p.pageId, p.violations.length])).toEqual([
+      [t.one, 0],
+      [t.two, 1],
+    ]);
+    expect(result.callList).toEqual([
+      `GET /v1/pages/${t.db}`,
+      `POST /v1/data_sources/${t.db}/query`,
+      `GET /v1/databases/${t.db}`,
+      `POST /v1/data_sources/${t.ds}/query`,
+    ]);
+  });
+
+  it("checks every page of a data source", async () => {
+    const result = await page(t.ds);
+    expect(out(result.stdout).pages.map((p) => p.pageId)).toEqual([t.one, t.two]);
+  });
+
+  it("exits with code 2 and lists the candidates for several data sources", async () => {
+    const result = await page(hex(t.multiDb));
+    expect(result.code).toBe(2);
+    const { error } = JSON.parse(result.stdout) as { error: { code: string; message: string } };
+    expect(error.code).toBe("ambiguous_database");
+    expect(error.message).toContain(`Backlog: ${t.multiDsA}`);
+    expect(error.message).toContain(`Archive: ${t.multiDsB}`);
+  });
+
+  it("reports the page error for an ID that is nothing readable", async () => {
+    const result = await page("9a8b7c6d-5e4f-8a1b-b2c3-0000000000ff");
+    expect(result.code).toBe(2);
+    expect(result.stdout).toContain("page 9a8b7c6d-5e4f-8a1b-b2c3-0000000000ff");
+  });
+});

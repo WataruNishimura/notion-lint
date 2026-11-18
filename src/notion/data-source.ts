@@ -28,7 +28,7 @@ export class DataSourceChoiceError extends Error {
     super(
       candidates.length === 0
         ? `the database ${databaseId} has no data source that this integration can read`
-        : `the database ${databaseId} has ${candidates.length} data sources. Set dataSource to the ID of one of them:\n${candidates
+        : `the database ${databaseId} has ${candidates.length} data sources. Use the ID of one of them instead:\n${candidates
             .map((c) => `  - ${c.name === "" ? "(untitled)" : c.name}: ${c.id}`)
             .join("\n")}`,
     );
