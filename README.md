@@ -6,6 +6,27 @@ See [docs/design.md](docs/design.md) for the design.
 
 > Currently implemented: loading and validating the config, the `schema` / `print-config` / `agent` commands, and `check` with property and body (heading tree) matching. `doc.fromTemplate` (the body skeleton is built from a template page's headings), section numbers and references (`numbering`, `references`), and textlint (`text`).
 
+## Install
+
+After the first release (0.1.0), notion-lint is on npm. It needs Node 22 or later.
+
+```sh
+npm install --global notion-lint   # then run `notion-lint`
+npx notion-lint --help             # or run it without installing
+```
+
+Until then, or to run an unreleased version, build it from source:
+
+```sh
+git clone https://github.com/WataruNishimura/notion-lint.git
+cd notion-lint
+pnpm install
+pnpm build
+node dist/cli.js --help
+```
+
+To release a new version, see [docs/releasing.md](docs/releasing.md). Changes are listed in [CHANGELOG.md](CHANGELOG.md).
+
 ## `notion-lint check`
 
 ```sh
@@ -137,15 +158,15 @@ notion-lint --config-json '{"type":{...}}' --page <URL or ID>  # JSON in an argu
 }
 ```
 
-Exit codes: 0 means no violations, 1 means violations were found, and 2 means a config error, invalid arguments, or a Notion API error.
+Exit codes: 0 means no violations, 1 means violations were found, and 2 means a config error, invalid arguments, or a Notion API error. With `--format github`, an exit-2 error is written to standard output as an `::error title=notion-lint error` annotation.
 
 ## Scheduled runs on GitHub Actions
 
-[examples/github-actions/notion-lint.yml](examples/github-actions/notion-lint.yml) is a workflow that runs `notion-lint check --format github` on a `schedule` (cron) and on `workflow_dispatch`, with [a small config](examples/github-actions/notion-lint.config.json). Copy it to `.github/workflows/` in the repository that holds your config, and change the parts marked `CHANGE` (cron time, notion-lint version, config path).
+[examples/github-actions/notion-lint.yml](examples/github-actions/notion-lint.yml) is a workflow that runs `notion-lint check --format github` on a `schedule` (cron) and on `workflow_dispatch`, with [a small config](examples/github-actions/notion-lint.config.json). Copy it to `.github/workflows/` in the repository that holds your config, and change the parts marked `CHANGE` (cron time, notion-lint version, config path). The example builds notion-lint from source; comments in it show how to switch to `npx notion-lint@0.1.0` after the first release.
 
 - Create the repository secret `NOTION_TOKEN`. The workflow passes it as an environment variable; never write it in a file.
 - With `--format github`, each violation is an annotation (`::error` or `::warning`) that ends with a Notion link: the block when the violation has one, otherwise the page. The workflow also writes the one-line result to the run's summary page.
-- Exit code 0 passes the job. Exit code 1 (violations) and 2 (config error, invalid arguments, or Notion API error) both fail it, so GitHub's usual failed-workflow notification reports both. Violations appear as annotations; exit code 2 prints its message in the step log. A comment in the workflow shows how to keep the job green when there are only violations.
+- Exit code 0 passes the job. Exit code 1 (violations) and 2 (config error, invalid arguments, or Notion API error) both fail it, so GitHub's usual failed-workflow notification reports both. Violations appear as annotations. With `--format github`, exit code 2 is also an `::error` annotation titled `notion-lint error`: the message, the mismatched config fields, and, for a config file, `file=` set to that file. Its message names the page or data source when the error is about one. Other formats keep their own error output (text on standard error, JSON as described above). A comment in the workflow shows how to keep the job green when there are only violations.
 - The example sits under `examples/`, so this repository's own CI does not run it (it has no Notion token). Its syntax was checked with actionlint.
 
 ## Config file
@@ -179,7 +200,7 @@ pnpm install
 pnpm test          # vitest
 pnpm typecheck     # tsc --noEmit
 pnpm lint          # biome check
-pnpm check         # all three of the above
+pnpm check         # all three of the above (the tests also build and pack the package)
 pnpm build         # outputs to dist/
 pnpm dev schema    # run the CLI without building
 ```

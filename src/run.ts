@@ -10,7 +10,7 @@ import {
 } from "./config/load.js";
 import type { PageFetcher } from "./notion/fetch.js";
 import { parseNotionId } from "./notion/id.js";
-import { formatGithub, formatJson, formatText } from "./report/index.js";
+import { formatErrorGithub, formatGithub, formatJson, formatText } from "./report/index.js";
 import { type ErrorKind, type ErrorResult, ExitCode, exitCodeFor } from "./schema/result.js";
 import { configJsonSchema, resultJsonSchema } from "./schema/validate.js";
 import { VERSION } from "./version.js";
@@ -76,7 +76,8 @@ agent options:
 Exit codes:
   0  No violations
   1  Violations found
-  2  Config error, invalid arguments, or Notion API error (with --format json, returned as JSON)
+  2  Config error, invalid arguments, or Notion API error (with --format json, returned as JSON;
+     with --format github, an ::error annotation)
 `;
 
 class UsageError extends Error {}
@@ -93,9 +94,17 @@ function json(value: unknown): string {
   return `${JSON.stringify(value, null, 2)}\n`;
 }
 
-/** Errors are JSON. `check --format json` puts them on stdout (its result channel), others on stderr. */
-function writeError(io: Io, result: ErrorResult, channel: "stdout" | "stderr" | "text"): ExitCode {
-  if (channel === "stdout") io.stdout(json(result));
+/**
+ * Errors are JSON. `check --format json` puts them on stdout (its result channel), others on
+ * stderr. `check --format github` writes an annotation to stdout, where the runner reads them.
+ */
+function writeError(
+  io: Io,
+  result: ErrorResult,
+  channel: "stdout" | "stderr" | "text" | "github",
+): ExitCode {
+  if (channel === "github") io.stdout(formatErrorGithub(result));
+  else if (channel === "stdout") io.stdout(json(result));
   else if (channel === "stderr") io.stderr(json(result));
   else {
     const { error } = result;
@@ -229,23 +238,25 @@ export function parseCheckArgs(args: string[], cwd: string): CheckOptions {
   return { source: configSource(values, cwd), pages, format: format as Format };
 }
 
-/** Decide where errors go before the arguments are fully parsed. */
-function wantsJson(args: string[]): boolean {
+/** The `--format` value, read before the arguments are fully parsed, to decide where errors go. */
+function requestedFormat(args: string[]): string | undefined {
   const i = args.findIndex((a) => a === "--format" || a.startsWith("--format="));
-  if (i === -1) return false;
+  if (i === -1) return undefined;
   const arg = args[i] as string;
-  return (arg.includes("=") ? arg.slice(arg.indexOf("=") + 1) : args[i + 1]) === "json";
+  return arg.includes("=") ? arg.slice(arg.indexOf("=") + 1) : args[i + 1];
 }
 
 async function checkCommand(args: string[], io: Io): Promise<ExitCode> {
   let options: CheckOptions;
-  const early = wantsJson(args) ? "stdout" : "text";
+  const requested = requestedFormat(args);
+  const early = requested === "json" ? "stdout" : requested === "github" ? "github" : "text";
   try {
     options = parseCheckArgs(args, io.cwd);
   } catch (error) {
     return writeError(io, errorResult("usage", (error as Error).message), early);
   }
-  const channel = options.format === "json" ? "stdout" : "text";
+  const channel =
+    options.format === "json" ? "stdout" : options.format === "github" ? "github" : "text";
 
   const load = await loadConfig(options.source, { cwd: io.cwd, readStdin: io.readStdin });
   if (!load.ok) return writeError(io, loadError(load), channel);

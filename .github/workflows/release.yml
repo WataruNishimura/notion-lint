@@ -1,0 +1,74 @@
+# Publishes notion-lint to npm when a version tag (v0.1.0, ...) is pushed. The maintainer starts it
+# by pushing the tag; see docs/releasing.md. It never runs on pull requests or on push to main.
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  # contents: write lets the last step create the GitHub release.
+  contents: write
+  # id-token: write lets npm sign the provenance statement.
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # The pnpm version comes from the packageManager field in package.json.
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check (typecheck, lint, test)
+        run: pnpm check
+
+      - name: Build
+        run: pnpm build
+
+      - name: Verify that the tag matches package.json
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          if [ "$TAG" != "v$version" ]; then
+            echo "::error::Tag $TAG does not match the version in package.json (v$version)"
+            exit 1
+          fi
+
+      - name: Publish to npm
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # The release text is the CHANGELOG section of this version, e.g. "## 0.1.0 - 2026-11-18".
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          version="${TAG#v}"
+          awk -v v="$version" '
+            /^## / { if (found) exit; if ($2 == v) { found = 1; next } }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
+          if [ ! -s release-notes.md ]; then
+            echo "::warning::No CHANGELOG section found for $version; using a generic release text"
+            echo "Release $version. See CHANGELOG.md." > release-notes.md
+          fi
+          gh release create "$TAG" --title "$TAG" --notes-file release-notes.md --verify-tag
