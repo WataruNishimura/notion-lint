@@ -4,6 +4,7 @@ import type {
   HeadingItem,
   NotionLink,
   PageModel,
+  TextSpan,
 } from "../normalize/model.js";
 import { joinPath } from "../path.js";
 import type { NumberingRule, ReferencesRule } from "../schema/config.js";
@@ -25,6 +26,10 @@ import { allHeadings, type HeadingFormat, headingFormats } from "./numbering.js"
  *   (`outsideLinks`), since that needs the Notion API.
  * - `ignore`: text that is never a reference. A match that overlaps an ignored word or an
  *   ignored regex match is skipped.
+ * - A pattern with `{page}` (a regex: a group `page`) names the page the section is on: a page
+ *   mention, or the title of a page checked in the same run (`OtherPages`). Its number and
+ *   title are matched against that page's headings, with the same rules. A page that is not
+ *   checked, or a title that several checked pages share, is not checked.
  */
 
 const escapeRegex = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -96,32 +101,35 @@ const isWordChar = (char: string | undefined): boolean =>
  * whitespace matches any whitespace). A `{title}` between punctuation (quotes, brackets)
  * takes any text up to the closing character. A `{title}` without such delimiters only
  * matches the titles of the page's headings, since its end cannot be told otherwise.
+ * `{page}` works the same way: between punctuation it takes any text, elsewhere it matches
+ * one of `pages`.
  */
-export function compileTemplate(template: string, titles: string[], number: string): RegExp {
-  const tokens = template.split(/(\{n\}|\{title\})/);
+export function compileTemplate(
+  template: string,
+  titles: string[],
+  number: string,
+  pages: string[] = [],
+): RegExp {
+  const tokens = template.split(/(\{n\}|\{title\}|\{page\})/);
   let source = "";
   let seenN = false;
   let seenTitle = false;
+  let seenPage = false;
   tokens.forEach((token, i) => {
+    if (token === "{page}") {
+      const body = delimited(tokens[i - 1], tokens[i + 1]) ?? pageAlternatives(pages);
+      source += seenPage ? `(?:${body})` : `(?<page>${body})`;
+      seenPage = true;
+      return;
+    }
     if (token === "{n}") {
       source += seenN ? `(?:${number})` : `(?<n>${number})`;
       seenN = true;
       return;
     }
     if (token === "{title}") {
-      const before = (tokens[i - 1] ?? "").at(-1);
-      const after = (tokens[i + 1] ?? "").at(0);
-      let body: string;
-      if (
-        before !== undefined &&
-        after !== undefined &&
-        !/\s/u.test(before) &&
-        !/\s/u.test(after) &&
-        !isWordChar(before) &&
-        !isWordChar(after)
-      ) {
-        body = `[^${escapeRegex(after).replace(/-/g, "\\-")}\\n]+`;
-      } else {
+      let body = delimited(tokens[i - 1], tokens[i + 1]);
+      if (body === undefined) {
         const alternatives = [...titles]
           .filter((title) => title !== "")
           .sort((a, b) => b.length - a.length)
@@ -142,8 +150,55 @@ export function compileTemplate(template: string, titles: string[], number: stri
   return new RegExp(source, "dgiu");
 }
 
-function compilePattern(pattern: string | Regex, titles: string[], number: string): RegExp {
-  if (typeof pattern === "string") return compileTemplate(pattern, titles, number);
+/**
+ * For a placeholder between punctuation (quotes, brackets): any text up to the closing
+ * character. Undefined when the placeholder is not delimited that way.
+ */
+function delimited(beforeToken: string | undefined, afterToken: string | undefined) {
+  const before = (beforeToken ?? "").at(-1);
+  const after = (afterToken ?? "").at(0);
+  if (
+    before === undefined ||
+    after === undefined ||
+    /\s/u.test(before) ||
+    /\s/u.test(after) ||
+    isWordChar(before) ||
+    isWordChar(after)
+  ) {
+    return undefined;
+  }
+  return `[^${escapeRegex(after).replace(/-/g, "\\-")}\\n]+`;
+}
+
+/**
+ * An unquoted `{page}`: one of the given page names (mention texts, titles of checked pages),
+ * longest first. Only ASCII word characters get a word boundary, so that "仕様書の3章" finds
+ * "仕様書" right after other Japanese text.
+ */
+function pageAlternatives(pages: string[]): string {
+  const alternatives = [...new Set(pages)]
+    .filter((name) => name.trim() !== "")
+    .sort((a, b) => b.length - a.length)
+    .map(
+      (name) =>
+        `${/^[A-Za-z0-9_]/.test(name) ? "(?<![A-Za-z0-9_])" : ""}${escapeRegex(name)}${
+          /[A-Za-z0-9_]$/.test(name) ? "(?![A-Za-z0-9_])" : ""
+        }`,
+    );
+  return alternatives.length === 0 ? "(?!)" : alternatives.join("|");
+}
+
+/** Whether a pattern names a page: a template with `{page}`, or a regex with a group `page`. */
+const isPagePattern = (pattern: string | Regex): boolean =>
+  typeof pattern === "string" ? pattern.includes("{page}") : pattern.pattern.includes("(?<page>");
+
+function compilePattern(
+  pattern: string | Regex,
+  titles: string[],
+  number: string,
+  pages: string[],
+): RegExp {
+  if (typeof pattern === "string") return compileTemplate(pattern, titles, number, pages);
   const flags = new Set([...(pattern.flags ?? ""), "d", "g"]);
   return new RegExp(pattern.pattern, [...flags].join(""));
 }
@@ -155,8 +210,12 @@ interface Reference {
   block: BlockItem;
   /** The whole match. */
   text: string;
+  /** Where the match starts in the block's text. */
+  at: number;
   n: { text: string; key: string; start: number; end: number } | undefined;
   title: { text: string; start: number; end: number } | undefined;
+  /** The page the reference names (`{page}`), with offsets relative to the match. */
+  page: { text: string; start: number; end: number } | undefined;
 }
 
 /** Ranges of the text that `ignore` excludes. */
@@ -180,11 +239,18 @@ function ignoredRanges(text: string, ignore: (string | Regex)[]): [number, numbe
 const overlaps = (ranges: [number, number][], start: number, end: number): boolean =>
   ranges.some(([s, e]) => start < e && s < end);
 
-function findReferences(block: BlockItem, patterns: RegExp[], ignore: (string | Regex)[]) {
+/** `patterns` are tried in the order of `order` (indices into `patterns`). */
+function findReferences(
+  block: BlockItem,
+  patterns: RegExp[],
+  order: number[],
+  ignore: (string | Regex)[],
+) {
   const refs: Reference[] = [];
   const ignored = ignoredRanges(block.text, ignore);
   const taken: [number, number][] = [];
-  patterns.forEach((regex, pattern) => {
+  for (const pattern of order) {
+    const regex = patterns[pattern] as RegExp;
     for (const match of block.text.matchAll(regex)) {
       const start = match.index;
       const end = start + match[0].length;
@@ -203,11 +269,13 @@ function findReferences(block: BlockItem, patterns: RegExp[], ignore: (string | 
         pattern,
         block,
         text: match[0],
+        at: start,
         n: n === undefined ? undefined : { ...n, key: numberKey(n.text) },
         title: title === undefined ? undefined : { ...title, text: title.text.trim() },
+        page: span("page"),
       });
     }
-  });
+  }
   return refs;
 }
 
@@ -226,30 +294,132 @@ const sameId = (a: string, b: string): boolean =>
 const splice = (text: string, start: number, end: number, value: string): string =>
   `${text.slice(0, start)}${value}${text.slice(end)}`;
 
+/**
+ * The pages checked in the run, for references that name a page (`{page}`). `check` builds
+ * it from the pages it has already fetched, so nothing is fetched for it.
+ */
+export interface OtherPages {
+  /** Titles of the checked pages. */
+  titles: string[];
+  /** Heading titles of the checked pages that have a body (for an unquoted `{title}`). */
+  headingTitles: string[];
+  /** IDs of the checked pages whose `pageTitleKey` is `key`. */
+  withTitle(key: string): string[];
+  /** A checked page with a body, as a reference target; undefined when there is none. */
+  target(pageId: string): LinkTarget | undefined;
+}
+
+/** Quotes and brackets around a page name in the text, which are not part of the title. */
+const ENCLOSING: [string, string][] = [
+  ['"', '"'],
+  ["'", "'"],
+  ["“", "”"],
+  ["‘", "’"],
+  ["「", "」"],
+  ["『", "』"],
+  ["(", ")"],
+  ["（", "）"],
+  ["[", "]"],
+  ["【", "】"],
+  ["<", ">"],
+  ["《", "》"],
+];
+
+/**
+ * How a page name in the text is compared with page titles: trimmed, without one pair of
+ * enclosing quotes or brackets, and ignoring case. Nothing else is fuzzy.
+ */
+export function pageTitleKey(name: string): string {
+  let text = name.trim();
+  for (const [open, close] of ENCLOSING) {
+    if (text.length > open.length + close.length && text.startsWith(open) && text.endsWith(close)) {
+      text = text.slice(open.length, text.length - close.length).trim();
+      break;
+    }
+  }
+  return text.toLowerCase();
+}
+
+/** Page and database mentions in the block's text. */
+const mentions = (block: BlockItem): TextSpan[] =>
+  (block.rich ?? []).flat().filter((span) => span.kind === "mention" && span.pageId !== undefined);
+
+/**
+ * The page a `{page}` reference names: the mentioned page when the name is exactly a page
+ * mention, otherwise the one checked page with that title. Undefined when no page or several
+ * pages have that title (never a guess), or for a mention of a user or a date.
+ */
+function referencedPageId(
+  ref: Reference,
+  page: PageModel,
+  others: OtherPages | undefined,
+): string | undefined {
+  const name = ref.page as NonNullable<Reference["page"]>;
+  const start = ref.at + name.start;
+  const end = ref.at + name.end;
+  const mention = (ref.block.rich ?? [])
+    .flat()
+    .find(
+      (span) =>
+        span.kind === "mention" && span.start === start && span.start + span.text.length === end,
+    );
+  if (mention !== undefined) return mention.pageId;
+  const key = pageTitleKey(name.text);
+  const ids = others?.withTitle(key) ?? (pageTitleKey(page.title) === key ? [page.id] : []);
+  return ids.length === 1 ? ids[0] : undefined;
+}
+
+/**
+ * `others` are the pages checked in the run, for patterns that name a page (`{page}`). Without
+ * it, such a pattern can only name this page.
+ */
 export function checkReferences(
   rule: ReferencesRule,
   numbering: NumberingRule | undefined,
   page: PageModel,
+  others?: OtherPages,
 ): Finding[] {
   const findings: Finding[] = [];
   const formats = headingFormats(numbering);
   const headings = indexHeadings(page.body, formats);
-  const byKey = new Map<string, IndexedHeading>();
-  const byTitle = new Map<string, IndexedHeading>();
-  for (const heading of headings) {
-    if (heading.key !== undefined && !byKey.has(heading.key)) byKey.set(heading.key, heading);
-    if (!byTitle.has(heading.title)) byTitle.set(heading.title, heading);
-    if (!byTitle.has(heading.item.text)) byTitle.set(heading.item.text, heading);
-  }
+  const byKey = headingsByKey(headings);
+  const byTitle = headingsByTitle(headings);
   const titles = [...new Set(headings.map((h) => h.title))];
   const number = numberSource(formats);
-  const patterns = rule.patterns.map((p) => compilePattern(p, titles, number));
+  const named = rule.patterns.map(isPagePattern);
+  const pageNames = named.some(Boolean)
+    ? [
+        ...[...blocks(page.body)].flatMap((block) => mentions(block).map((span) => span.text)),
+        ...(others?.titles ?? [page.title]),
+      ]
+    : [];
+  const anyTitles = [...new Set([...titles, ...(others?.headingTitles ?? [])])];
+  const patterns = rule.patterns.map((p, i) =>
+    compilePattern(p, named[i] ? anyTitles : titles, number, pageNames),
+  );
+  // Patterns that name a page are tried first: "section 3 of Spec" is about Spec, so the
+  // shorter "section {n}" must not take it as a section of this page.
+  const order = [...rule.patterns.keys()].sort((a, b) => Number(named[b]) - Number(named[a]));
   const ignore = rule.ignore ?? [];
 
   for (const block of blocks(page.body)) {
     if (!TEXT_BLOCKS.has(block.type)) continue;
-    for (const ref of findReferences(block, patterns, ignore)) {
-      const finding = checkReference(ref, byKey, byTitle);
+    for (const ref of findReferences(block, patterns, order, ignore)) {
+      let sections = { byKey, byTitle };
+      let on = "";
+      if (ref.page !== undefined) {
+        const pageId = referencedPageId(ref, page, others);
+        if (pageId === undefined) continue;
+        if (!sameId(pageId, page.id)) {
+          // A page that is not checked (or has no body) falls back to the existence check
+          // of `notionLinks` for a mention, and to nothing for plain text.
+          const target = others?.target(pageId);
+          if (target === undefined) continue;
+          sections = target;
+          on = `on the page "${target.page.title}", `;
+        }
+      }
+      const finding = checkReference(ref, sections.byKey, sections.byTitle, on);
       if (finding === undefined) continue;
       findings.push({
         path: joinPath(joinPath("references", "patterns"), ref.pattern),
@@ -259,18 +429,21 @@ export function checkReferences(
     }
   }
 
-  if (rule.notionLinks === true) findings.push(...checkSamePageLinks(page, headings, byTitle));
+  if (rule.notionLinks === true)
+    findings.push(...checkSamePageLinks(page, headings, byTitle, byKey));
   return findings;
 }
 
 type Problem = Pick<Finding, "rule" | "message" | "suggestions">;
 
+/** `on` names the page the reference is on when it is not the page that holds it. */
 function checkReference(
   ref: Reference,
   byKey: Map<string, IndexedHeading>,
   byTitle: Map<string, IndexedHeading>,
+  on = "",
 ): Problem | undefined {
-  const quoted = `"${ref.text}"`;
+  const head = `"${ref.text}": ${on}`;
   const { n, title } = ref;
   const section = n === undefined ? undefined : byKey.get(n.key);
   const named = title === undefined ? undefined : byTitle.get(title.text);
@@ -290,7 +463,7 @@ function checkReference(
           ];
     return {
       rule: "references.title",
-      message: `${quoted}: there is no heading "${title.text}"`,
+      message: `${head}there is no heading "${title.text}"`,
       suggestions,
     };
   }
@@ -300,7 +473,7 @@ function checkReference(
     if (section !== undefined) return undefined;
     return {
       rule: "references.number",
-      message: `${quoted}: there is no section ${n.text}`,
+      message: `${head}there is no section ${n.text}`,
       suggestions: [],
     };
   }
@@ -330,40 +503,50 @@ function checkReference(
           : `"${title.text}" is ${named.number}`;
       return {
         rule: "references.mismatch",
-        message: `${quoted}: ${n.text} is "${section.title}"; ${where}`,
+        message: `${head}${n.text} is "${section.title}"; ${where}`,
         suggestions: [...renumber(named), retitle],
       };
     }
     return {
       rule: "references.mismatch",
-      message: `${quoted}: ${n.text} is "${section.title}"; there is no heading "${title.text}"`,
+      message: `${head}${n.text} is "${section.title}"; there is no heading "${title.text}"`,
       suggestions: [retitle],
     };
   }
   if (named !== undefined) {
     return {
       rule: "references.number",
-      message: `${quoted}: there is no section ${n.text}; "${title.text}" is ${named.number ?? "not numbered"}`,
+      message: `${head}there is no section ${n.text}; "${title.text}" is ${named.number ?? "not numbered"}`,
       suggestions: renumber(named),
     };
   }
   return {
     rule: "references.number",
-    message: `${quoted}: there is no section ${n.text} and no heading "${title.text}"`,
+    message: `${head}there is no section ${n.text} and no heading "${title.text}"`,
     suggestions: [],
   };
 }
 
 /**
- * What a link to a block of a page is checked against: the page's headings (numbered by the
- * page's own type) and the IDs of all its blocks.
+ * What a link to a block of a page (or a reference that names the page) is checked against:
+ * the page's headings (numbered by the page's own type) and the IDs of all its blocks.
  */
 export interface LinkTarget {
   page: PageModel;
   headings: IndexedHeading[];
   byTitle: Map<string, IndexedHeading>;
+  /** Numbered headings by number key ("2.1"). */
+  byKey: Map<string, IndexedHeading>;
   /** Block IDs, without hyphens, lowercase. */
   ids: Set<string>;
+}
+
+function headingsByKey(headings: IndexedHeading[]): Map<string, IndexedHeading> {
+  const byKey = new Map<string, IndexedHeading>();
+  for (const heading of headings) {
+    if (heading.key !== undefined && !byKey.has(heading.key)) byKey.set(heading.key, heading);
+  }
+  return byKey;
 }
 
 function headingsByTitle(headings: IndexedHeading[]): Map<string, IndexedHeading> {
@@ -390,7 +573,13 @@ function blockIds(page: PageModel): Set<string> {
 /** Index a page as the target of links. `numbering` is the numbering rule of the page's own type. */
 export function linkTarget(page: PageModel, numbering: NumberingRule | undefined): LinkTarget {
   const headings = indexHeadings(page.body, headingFormats(numbering));
-  return { page, headings, byTitle: headingsByTitle(headings), ids: blockIds(page) };
+  return {
+    page,
+    headings,
+    byTitle: headingsByTitle(headings),
+    byKey: headingsByKey(headings),
+    ids: blockIds(page),
+  };
 }
 
 /**
@@ -442,9 +631,10 @@ function checkSamePageLinks(
   page: PageModel,
   headings: IndexedHeading[],
   byTitle: Map<string, IndexedHeading>,
+  byKey: Map<string, IndexedHeading>,
 ): Finding[] {
   const findings: Finding[] = [];
-  const target: LinkTarget = { page, headings, byTitle, ids: blockIds(page) };
+  const target: LinkTarget = { page, headings, byTitle, byKey, ids: blockIds(page) };
   for (const block of blocks(page.body)) {
     if (block.type === "code") continue;
     for (const link of block.links ?? []) {

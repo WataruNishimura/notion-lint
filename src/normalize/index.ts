@@ -1,7 +1,14 @@
 import type { RawBlockTree } from "../notion/fetch.js";
 import { parseNotionId } from "../notion/id.js";
 import { mayBeTruncated } from "../notion/long-values.js";
-import type { BodyItem, HeadingItem, NotionLink, PageModel, PropertyValue } from "./model.js";
+import type {
+  BodyItem,
+  HeadingItem,
+  NotionLink,
+  PageModel,
+  PropertyValue,
+  TextSpan,
+} from "./model.js";
 
 /**
  * Convert Notion API JSON (API version 2025-09-03) into the internal representation.
@@ -109,24 +116,111 @@ function flatten(trees: RawBlockTree[]): BodyItem[] {
     const children = normalizeBlocks(tree.children);
     const level = /^heading_(\d)$/.exec(type)?.[1];
     if (level !== undefined) {
-      const text = plainText(content.rich_text).trim();
+      const { text, rich } = richTexts([content.rich_text]);
       // A toggle heading's own children come first in its section.
-      out.push({ kind: "heading", id, level: Number(level), text, children });
+      out.push({
+        kind: "heading",
+        id,
+        level: Number(level),
+        text,
+        ...(rich.some((cell) => cell.length > 0) ? { rich } : {}),
+        children,
+      });
       continue;
     }
     // A table row has cells (one rich text array each) instead of rich_text.
     const texts = type === "table_row" ? array(content.cells) : [content.rich_text];
-    const text = texts
-      .map((richText) => plainText(richText).trim())
-      .join("\n")
-      .trim();
+    const { text, rich } = richTexts(texts);
     const links = texts.flatMap(notionLinks);
     if (type === "link_to_page") {
       const target = str(content.page_id) ?? str(content.database_id);
       const pageId = target === null ? undefined : parseNotionId(target);
       if (pageId !== undefined) links.push({ kind: "block", text: "", pageId, blockId: null });
     }
-    out.push({ kind: "block", id, type, text, children, ...(links.length > 0 ? { links } : {}) });
+    out.push({
+      kind: "block",
+      id,
+      type,
+      text,
+      ...(type === "table_row" || rich.some((cell) => cell.length > 0) ? { rich } : {}),
+      children,
+      ...(links.length > 0 ? { links } : {}),
+    });
+  }
+  return out;
+}
+
+/**
+ * The text of one or more rich text arrays (table cells), each trimmed and joined with
+ * newlines, and their spans with offsets into that text.
+ */
+export function richTexts(texts: unknown[]): { text: string; rich: TextSpan[][] } {
+  const cells = texts.map((richText) => {
+    const spans = textSpans(richText);
+    const raw = spans.map((span) => span.text).join("");
+    const lead = raw.length - raw.trimStart().length;
+    const text = raw.trim();
+    return { text, spans: clip(spans, lead, lead + text.length) };
+  });
+  const joined = cells.map((cell) => cell.text).join("\n");
+  // The whole text is trimmed too (empty leading cells); move the offsets with it.
+  let at = -(joined.length - joined.trimStart().length);
+  const rich = cells.map((cell) => {
+    const spans = cell.spans.map((span) => ({ ...span, start: span.start + at }));
+    at += cell.text.length + 1;
+    return spans;
+  });
+  return { text: joined.trim(), rich };
+}
+
+/** Spans of a rich text array, with offsets into its plain text. */
+function textSpans(richText: unknown): TextSpan[] {
+  const spans: TextSpan[] = [];
+  let at = 0;
+  for (const raw of array(richText)) {
+    const item = record(raw);
+    const text = str(item.plain_text) ?? "";
+    if (text === "") continue;
+    let span: TextSpan;
+    if (item.type === "mention") {
+      const mention = record(item.mention);
+      const target = str(record(mention[str(mention.type) ?? ""]).id);
+      const pageId =
+        (mention.type === "page" || mention.type === "database") && target !== null
+          ? parseNotionId(target)
+          : undefined;
+      span = { kind: "mention", text, start: at, ...(pageId === undefined ? {} : { pageId }) };
+    } else if (item.type === "equation") {
+      span = { kind: "equation", text, start: at };
+    } else if (record(item.annotations).code === true) {
+      span = { kind: "code", text, start: at };
+    } else {
+      span = { kind: "text", text, start: at };
+    }
+    at += text.length;
+    // Notion splits text where formatting changes; neighbouring pieces of one kind are one span.
+    const last = spans.at(-1);
+    if (last !== undefined && span.kind !== "mention" && last.kind === span.kind) {
+      last.text += span.text;
+    } else {
+      spans.push(span);
+    }
+  }
+  return spans;
+}
+
+/** Spans cut to the range from `from` to `to`, with offsets relative to `from`. */
+function clip(spans: TextSpan[], from: number, to: number): TextSpan[] {
+  const out: TextSpan[] = [];
+  for (const span of spans) {
+    const start = Math.max(span.start, from);
+    const end = Math.min(span.start + span.text.length, to);
+    if (end <= start) continue;
+    out.push({
+      ...span,
+      text: span.text.slice(start - span.start, end - span.start),
+      start: start - from,
+    });
   }
   return out;
 }

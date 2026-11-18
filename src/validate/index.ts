@@ -5,22 +5,23 @@ import { checkBody } from "./body.js";
 import type { Finding } from "./finding.js";
 import { checkNumbering } from "./numbering.js";
 import { checkProperties } from "./properties.js";
-import { checkReferences } from "./references.js";
+import { checkReferences, type OtherPages } from "./references.js";
 
 export type { Finding } from "./finding.js";
 
 /**
  * Match one normalized page against a type. Properties first, then the body, section
  * numbers, and references. Links to other pages are checked in `check` (they need the API).
+ * `others` are the pages checked in the run, for references that name another page.
  */
-export function checkPage(page: PageModel, type: DocType): Finding[] {
+export function checkPage(page: PageModel, type: DocType, others?: OtherPages): Finding[] {
   return [
     ...checkProperties(type.properties ?? {}, page.properties),
     ...checkBody(type.body, page.body, type.headings, type.numbering),
     ...(type.numbering === undefined ? [] : checkNumbering(type.numbering, page.body)),
     ...(type.references === undefined
       ? []
-      : checkReferences(type.references, type.numbering, page)),
+      : checkReferences(type.references, type.numbering, page, others)),
   ];
 }
 
