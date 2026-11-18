@@ -7,7 +7,7 @@ import markdownPlugin from "@textlint/textlint-plugin-markdown";
 import type { BodyItem } from "../normalize/model.js";
 import type { TextRule } from "../schema/config.js";
 import type { Severity, Suggestion } from "../schema/result.js";
-import { toMarkdown } from "./markdown.js";
+import { type SourceLine, toMarkdown } from "./markdown.js";
 
 /**
  * textlint integration for the body text (`text.textlint` in a type).
@@ -151,13 +151,26 @@ export function prepareTextlint(
           blockId: source?.blockId ?? null,
           path: ["body", ...headings].join(" > "),
           rule: message.ruleId,
-          message: `${message.message} (${message.ruleId})`,
+          message: `${cellLabel(source, message.loc.start.column - 1)}${message.message} (${message.ruleId})`,
           severity: message.severity === 2 ? "error" : "warning",
           suggestions,
         };
       });
     },
   };
+}
+
+/**
+ * `row 2, column 1: ` for a message on a table row: the cell whose text (with the `| ` before
+ * it) holds the column. Empty for other lines.
+ */
+function cellLabel(source: SourceLine | undefined, column: number): string {
+  if (source?.row === undefined || source.cells === undefined) return "";
+  let cell = 0;
+  source.cells.forEach((position, i) => {
+    if (column >= position.start - 2) cell = i;
+  });
+  return `row ${source.row}, column ${cell + 1}: `;
 }
 
 function makeRule(

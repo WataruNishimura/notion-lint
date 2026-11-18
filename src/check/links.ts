@@ -7,7 +7,9 @@ import {
   checkBlockLink,
   type LinkTarget,
   linkTarget,
+  type OtherPages,
   outsideLinks,
+  pageTitleKey,
 } from "../validate/references.js";
 
 /**
@@ -35,6 +37,31 @@ export type CheckedPages = Map<string, CheckedPage>;
 
 export const checkedKey = (id: string): string => id.replace(/-/g, "").toLowerCase();
 
+/** The page as a target of links and references (built once, on first use). */
+function targetOf(checked: CheckedPage): LinkTarget {
+  checked.target ??= linkTarget(checked.page, checked.type.numbering);
+  return checked.target;
+}
+
+/**
+ * The checked pages, for text references that name a page (`{page}` in `references.patterns`):
+ * by ID (page mentions) and by title. Pages are not fetched again for it.
+ */
+export function checkedPageIndex(checked: CheckedPages): OtherPages {
+  const pages = [...checked.values()];
+  const withBody = pages.filter((page) => page.hasBody);
+  return {
+    titles: pages.map((page) => page.page.title),
+    headingTitles: withBody.flatMap((page) => targetOf(page).headings.map((h) => h.title)),
+    withTitle: (key) =>
+      pages.filter((page) => pageTitleKey(page.page.title) === key).map((page) => page.page.id),
+    target: (pageId) => {
+      const page = checked.get(checkedKey(pageId));
+      return page?.hasBody === true ? targetOf(page) : undefined;
+    },
+  };
+}
+
 /** Target ID -> why it cannot be read (undefined when it can). One request per target per run. */
 export type LinkCache = Map<string, Promise<string | undefined>>;
 
@@ -53,8 +80,7 @@ export async function checkOutsideLinks(
     const other = checked.get(checkedKey(link.pageId));
     if (other !== undefined && (other.hasBody || link.blockId === null)) {
       if (link.blockId !== null) {
-        other.target ??= linkTarget(other.page, other.type.numbering);
-        const finding = checkBlockLink(link, blockId, other.target, true);
+        const finding = checkBlockLink(link, blockId, targetOf(other), true);
         if (finding !== undefined) findings.push(finding);
       }
       continue;

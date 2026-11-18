@@ -18,7 +18,13 @@ import type {
 import { type PreparedTextlint, prepareTextlint, TextlintSetupError } from "../text/textlint.js";
 import { checkPage, type Finding, needsBody, skippedParts } from "../validate/index.js";
 import { skeletonFromTemplate, withTemplateBody } from "../validate/template.js";
-import { type CheckedPages, checkedKey, checkOutsideLinks, type LinkCache } from "./links.js";
+import {
+  type CheckedPages,
+  checkedKey,
+  checkedPageIndex,
+  checkOutsideLinks,
+  type LinkCache,
+} from "./links.js";
 import { compareFiles, compareFormula, compareRollup } from "./where.js";
 
 /**
@@ -130,10 +136,10 @@ export async function runCheck(
   const templates = new Map<string, Promise<BodyItem[]>>();
   const linkTargets: LinkCache = new Map();
   const dataSources = new DataSourceResolver(fetcher);
-  // Pages are all fetched and matched first, so that links between checked pages can be
+  // Pages are all fetched first, so that links and references between checked pages can be
   // checked against each other's headings without fetching a page again.
   const checked: CheckedPages = new Map();
-  const fetched: { page: PageModel; type: DocType; findings: Finding[]; text: Finding[] }[] = [];
+  const fetched: { page: PageModel; type: DocType; text: Finding[] }[] = [];
 
   for (const [planIndex, rawPlan] of plans.entries()) {
     const plan = { ...rawPlan, type: await resolveTemplate(rawPlan, fetcher, templates) };
@@ -158,7 +164,6 @@ export async function runCheck(
       fetched.push({
         page,
         type: plan.type,
-        findings: checkPage(page, plan.type),
         text: textlint === undefined ? [] : await textFindings(textlint, page),
       });
       const key = checkedKey(page.id);
@@ -167,7 +172,9 @@ export async function runCheck(
       }
     }
   }
-  for (const { page, type, findings, text } of fetched) {
+  const others = checkedPageIndex(checked);
+  for (const { page, type, text } of fetched) {
+    const findings = checkPage(page, type, others);
     findings.push(...(await checkOutsideLinks(page, type, fetcher, linkTargets, checked)), ...text);
     results.push(pageResult(page, type, findings));
   }

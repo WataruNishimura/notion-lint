@@ -259,7 +259,10 @@ export function numbering(rule: NumberingRule): NumberingRule {
 }
 
 export interface ReferencesOptions {
-  /** Templates with `{n}` / `{title}` (`"see section {n}"`), or regexps with named groups `n` / `title`. */
+  /**
+   * Templates with `{n}` / `{title}` / `{page}` (`"see section {n}"`, `"{page}の{n}章"`), or
+   * regexps with named groups `n` / `title` / `page`.
+   */
   patterns: readonly (string | RegExp)[];
   notionLinks?: boolean;
   ignore?: readonly (string | RegExp)[];

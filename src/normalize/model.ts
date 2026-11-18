@@ -66,6 +66,8 @@ export interface HeadingItem {
   level: number;
   /** Plain text, trimmed. */
   text: string;
+  /** The heading's rich text as spans over `text` (absent when it has none). */
+  rich?: TextSpan[][];
   children: BodyItem[];
 }
 
@@ -79,6 +81,12 @@ export interface BlockItem {
    * joined with newlines.
    */
   text: string;
+  /**
+   * The rich text as spans over `text`: one list for most blocks, one per cell for a table
+   * row (absent for blocks without rich text). Used to tell prose from inline code and
+   * mentions, and to find mentions in the text.
+   */
+  rich?: TextSpan[][];
   /** Child blocks (toggle contents, nested list items, ...), as a heading tree too. */
   children: BodyItem[];
   /** Links to Notion pages and blocks in the block's text (absent when there are none). */
@@ -98,6 +106,21 @@ export interface NotionLink {
   pageId: string;
   /** The linked block within that page (the URL fragment), hyphenated; null for a page link. */
   blockId: string | null;
+}
+
+/**
+ * A piece of rich text. Formatting that does not change what the text is (bold, italic,
+ * colours, links) is not kept.
+ */
+export interface TextSpan {
+  /** `text` (prose, including link text), `code` (inline code), `equation`, or `mention` (Notion writes its text). */
+  kind: "text" | "code" | "equation" | "mention";
+  /** The span's text, as it appears in the block's `text`. */
+  text: string;
+  /** Offset of the span in the block's `text`. */
+  start: number;
+  /** For a page or database mention: the page, hyphenated. */
+  pageId?: string;
 }
 
 export type BodyItem = HeadingItem | BlockItem;
