@@ -194,7 +194,7 @@ Notion headings have no automatic section numbers, so the numbers are assumed to
 | Block link with text "2.1 Background" | The linked heading is 2.1 "Background" | Sections were reordered but the link text is stale |
 
 - When a number and a title disagree, the message shows the fix, e.g. "2.1 is 'Purpose'. 'Background' is 2.2".
-- References to other pages (page mentions, links to blocks on other pages) only check that the target exists and can be read. Checking the target's section numbers is done only when that page is also a check target.
+- References to other pages (page mentions, links to blocks on other pages) check that the target exists and can be read. When that page is also a check target in the same run, a link to a block on it is also checked against its headings (see below).
 - "Chapter 3" in the body may refer to a chapter in a different document, so `ignore` lets you specify excluded words or excluded ranges.
 - How it is implemented:
   - Searched blocks: paragraphs, list items, to-dos, toggles, quotes, callouts, and table cells. Code blocks and headings are not searched.
@@ -203,7 +203,8 @@ Notion headings have no automatic section numbers, so the numbers are assumed to
   - Without `numbering`, a heading that starts with "2.1 " or "2. " still counts as that section.
   - `ignore`: a reference that overlaps an occurrence of an ignored string, or a match of an ignored regex, is skipped. A regex covers ranges such as "chapter 3 of RFC 9110".
   - Same-page links (`notionLinks`): only link text that reads like a reference is checked: text that starts with a section number, or that is another heading's title. Free text such as "here" is not. Mentions are not checked for text, since Notion keeps it up to date.
-  - Other pages (`notionLinks`): page mentions, links to pages or blocks, and `link_to_page` blocks. Each target is retrieved once per run with `GET /v1/blocks/{id}` (a page ID works too); not found, no access, or in the trash is a violation, and other API errors stop the check (exit code 2). The target's section numbers are not checked yet, even when that page is also a check target.
+  - Other pages (`notionLinks`): page mentions, links to pages or blocks, and `link_to_page` blocks. Each target is retrieved once per run with `GET /v1/blocks/{id}` (a page ID works too); not found, no access, or in the trash is a violation, and other API errors stop the check (exit code 2). 
+  - Other pages that are also checked in the run: all pages are fetched and matched first, and links are validated afterwards, so a checked page is never fetched again, and it counts as existing without a request. A text link to a block on it is matched against that page's headings the way same-page links are (`references.link`), using the page's own type: its `numbering` format when it has one, otherwise the "2.1 " / "2. " fallback. The message names the page: `link "2.1 Quotas" points to the heading "2.2 Quotas" on the page "API reference"`, with the same suggestion (the heading text). A block that is no longer on that page is also `references.link`. Page mentions, links to a page without a block, and mentions of a block are only checked for existence, since Notion keeps their text up to date. This also holds when the other page's type needs no body (it was fetched without blocks): then its block links fall back to the existence check. Text references (`patterns`) are matched against the page that holds them only, because they do not name a page. If a page is checked twice with different types, the first one is used.
 
 ## Tests
 
