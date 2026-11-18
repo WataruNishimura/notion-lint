@@ -67,9 +67,13 @@ describe("checkProperties", () => {
     expect(
       check({ type: "people", min: 2 }, { type: "people", count: 1, hasMore: false })[0]?.message,
     ).toBe("needs at least 2 people (1 found)");
-    // A truncated list (more than 25 items) is not reported as too short.
+    // `check` completes long lists before matching, so `min` is exact beyond 25 items too.
     expect(
-      check({ type: "relation", min: 30 }, { type: "relation", count: 25, hasMore: true }),
+      check({ type: "relation", min: 30 }, { type: "relation", count: 25, hasMore: false })[0]
+        ?.message,
+    ).toBe("needs at least 30 related pages (25 found)");
+    expect(
+      check({ type: "relation", min: 30 }, { type: "relation", count: 31, hasMore: false }),
     ).toEqual([]);
     expect(
       rules(check({ type: "checkbox", required: true }, { type: "checkbox", checked: false })),

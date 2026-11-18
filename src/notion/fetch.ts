@@ -15,8 +15,21 @@ export interface RawBlockTree {
 export interface PageFetcher {
   /** The page object (properties, URL, ...). */
   page(pageId: string): Promise<Record<string, unknown>>;
-  /** Every page in a data source (all result pages of the query). */
-  dataSourcePages(dataSourceId: string): Promise<Record<string, unknown>[]>;
+  /** The data source object (its `properties` hold the schema). Fetched once per data source. */
+  dataSource(dataSourceId: string): Promise<Record<string, unknown>>;
+  /**
+   * The pages of a data source (all result pages of the query), narrowed by `filter` when
+   * given. Page objects truncate long property lists; see `propertyItems`.
+   */
+  dataSourcePages(
+    dataSourceId: string,
+    filter?: Record<string, unknown>,
+  ): Promise<Record<string, unknown>[]>;
+  /**
+   * The full value of a list-valued property (title, rich_text, people, files, relation):
+   * every property item, across all result pages of `pages.properties.retrieve`.
+   */
+  propertyItems(pageId: string, propertyId: string): Promise<Record<string, unknown>[]>;
   /** The page's blocks, with children fetched recursively. */
   blocks(pageId: string): Promise<RawBlockTree[]>;
   /** One block without its children. A page or database ID returns its `child_page` / `child_database` block. */
@@ -68,6 +81,7 @@ export class NotionFetcher implements PageFetcher {
   readonly #now: () => number;
   readonly #sleep: (ms: number) => Promise<void>;
   #nextStart = Number.NEGATIVE_INFINITY;
+  readonly #dataSources = new Map<string, Promise<Record<string, unknown>>>();
 
   constructor(api: NotionApi, options: FetcherOptions = {}) {
     this.#api = api;
@@ -86,16 +100,49 @@ export class NotionFetcher implements PageFetcher {
     return asRecord(page);
   }
 
-  async dataSourcePages(dataSourceId: string): Promise<Record<string, unknown>[]> {
+  dataSource(dataSourceId: string): Promise<Record<string, unknown>> {
+    let schema = this.#dataSources.get(dataSourceId);
+    if (schema === undefined) {
+      schema = this.#request(`data source ${dataSourceId}`, () =>
+        this.#api.retrieveDataSource({ data_source_id: dataSourceId }),
+      ).then(asRecord);
+      this.#dataSources.set(dataSourceId, schema);
+      // A failure is not cached, so a later call tries again.
+      schema.catch(() => this.#dataSources.delete(dataSourceId));
+    }
+    return schema;
+  }
+
+  async dataSourcePages(
+    dataSourceId: string,
+    filter?: Record<string, unknown>,
+  ): Promise<Record<string, unknown>[]> {
     const results = await this.#paginate(`data source ${dataSourceId}`, (start_cursor) =>
       this.#api.queryDataSource({
         data_source_id: dataSourceId,
+        ...(filter === undefined ? {} : { filter }),
         page_size: PAGE_SIZE,
         ...(start_cursor === undefined ? {} : { start_cursor }),
       }),
     );
     // A query can also return data sources (wiki-style databases); only pages are checked.
     return results.map(asRecord).filter((item) => item.object === "page");
+  }
+
+  async propertyItems(pageId: string, propertyId: string): Promise<Record<string, unknown>[]> {
+    const results = await this.#paginate(
+      `property ${propertyId} of ${pageId}`,
+      async (start_cursor) => {
+        const response = await this.#api.retrievePropertyItem({
+          page_id: pageId,
+          property_id: propertyId,
+          page_size: PAGE_SIZE,
+          ...(start_cursor === undefined ? {} : { start_cursor }),
+        });
+        return response as ListResponse;
+      },
+    );
+    return results.map(asRecord);
   }
 
   async blocks(pageId: string): Promise<RawBlockTree[]> {

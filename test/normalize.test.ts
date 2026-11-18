@@ -25,7 +25,12 @@ describe("normalizePage", () => {
     expect(page.properties).toEqual({
       名前: { type: "title", text: "議事録 2026-11-04 定例" },
       日付: { type: "date", start: "2026-11-04", end: null },
-      参加者: { type: "people", count: 2, hasMore: false },
+      参加者: {
+        type: "people",
+        count: 2,
+        hasMore: false,
+        ids: ["1d2e3f40-0000-4000-8000-000000000001", "1d2e3f40-0000-4000-8000-000000000002"],
+      },
       種別: { type: "select", value: "定例" },
       チケット: { type: "rich_text", text: "OPS-42" },
       公開: { type: "checkbox", checked: true },
@@ -79,7 +84,7 @@ describe("normalizePage", () => {
       n: { type: "number", value: null },
       s: { type: "status", value: null },
       m: { type: "multi_select", values: ["a", "b"] },
-      r: { type: "relation", count: 1, hasMore: true },
+      r: { type: "relation", count: 1, hasMore: true, ids: ["x"] },
       u: { type: "url", text: "" },
     });
   });

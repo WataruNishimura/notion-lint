@@ -1,0 +1,3320 @@
+{
+  "description": "Recorded-style Notion API responses (2025-09-03 shapes) for a data source with long people / relation lists, used by the server-side where and long property list tests. Keys ending in a JSON filter replay the result the server returns for that query filter.",
+  "ids": {
+    "dataSource": "4c2e9a1b-7d3f-80b2-a5c6-1e8f0b2d4a02",
+    "alpha": "4c2e9a1b-7d3f-8011-b001-000000000001",
+    "beta": "4c2e9a1b-7d3f-8011-b001-000000000002",
+    "gamma": "4c2e9a1b-7d3f-8011-b001-000000000003",
+    "propertyIds": {
+      "name": "title",
+      "status": "St%3Aa",
+      "kind": "Kn%3Ad",
+      "tags": "Tg%3As",
+      "done": "Dn%3Ae",
+      "points": "Pt%3As",
+      "due": "Du%3Ae",
+      "notes": "Nt%3As",
+      "owners": "Ow%3An",
+      "related": "Rl%3At",
+      "link": "Lk%3Ai",
+      "score": "Sc%3Ar",
+      "files": "Fl%3As"
+    },
+    "ownerBeyond25": "5d3f0b2c-0000-4000-8000-000000000030"
+  },
+  "responses": {
+    "GET /v1/data_sources/4c2e9a1b-7d3f-80b2-a5c6-1e8f0b2d4a02": {
+      "object": "data_source",
+      "id": "4c2e9a1b-7d3f-80b2-a5c6-1e8f0b2d4a02",
+      "title": [
+        {
+          "type": "text",
+          "text": {
+            "content": "Design docs",
+            "link": null
+          },
+          "annotations": {
+            "bold": false,
+            "italic": false,
+            "strikethrough": false,
+            "underline": false,
+            "code": false,
+            "color": "default"
+          },
+          "plain_text": "Design docs",
+          "href": null
+        }
+      ],
+      "properties": {
+        "Name": {
+          "id": "title",
+          "name": "Name",
+          "type": "title",
+          "title": {}
+        },
+        "Status": {
+          "id": "St%3Aa",
+          "name": "Status",
+          "type": "status",
+          "status": {
+            "options": [
+              {
+                "name": "Draft"
+              },
+              {
+                "name": "Final"
+              }
+            ],
+            "groups": []
+          }
+        },
+        "Kind": {
+          "id": "Kn%3Ad",
+          "name": "Kind",
+          "type": "select",
+          "select": {
+            "options": [
+              {
+                "name": "RFC"
+              },
+              {
+                "name": "Spec"
+              }
+            ]
+          }
+        },
+        "Tags": {
+          "id": "Tg%3As",
+          "name": "Tags",
+          "type": "multi_select",
+          "multi_select": {
+            "options": [
+              {
+                "name": "api"
+              },
+              {
+                "name": "ui"
+              }
+            ]
+          }
+        },
+        "Done": {
+          "id": "Dn%3Ae",
+          "name": "Done",
+          "type": "checkbox",
+          "checkbox": {}
+        },
+        "Points": {
+          "id": "Pt%3As",
+          "name": "Points",
+          "type": "number",
+          "number": {
+            "format": "number"
+          }
+        },
+        "Due": {
+          "id": "Du%3Ae",
+          "name": "Due",
+          "type": "date",
+          "date": {}
+        },
+        "Notes": {
+          "id": "Nt%3As",
+          "name": "Notes",
+          "type": "rich_text",
+          "rich_text": {}
+        },
+        "Owners": {
+          "id": "Ow%3An",
+          "name": "Owners",
+          "type": "people",
+          "people": {}
+        },
+        "Related": {
+          "id": "Rl%3At",
+          "name": "Related",
+          "type": "relation",
+          "relation": {
+            "data_source_id": "4c2e9a1b-7d3f-80b2-a5c6-1e8f0b2d4a02",
+            "type": "single_property",
+            "single_property": {}
+          }
+        },
+        "Link": {
+          "id": "Lk%3Ai",
+          "name": "Link",
+          "type": "url",
+          "url": {}
+        },
+        "Score": {
+          "id": "Sc%3Ar",
+          "name": "Score",
+          "type": "formula",
+          "formula": {
+            "expression": "1"
+          }
+        },
+        "Attachments": {
+          "id": "Fl%3As",
+          "name": "Attachments",
+          "type": "files",
+          "files": {}
+        }
+      }
+    },
+    "POST /v1/data_sources/4c2e9a1b-7d3f-80b2-a5c6-1e8f0b2d4a02/query": [
+      {
+        "object": "list",
+        "results": [
+          {
+            "object": "page",
+            "id": "4c2e9a1b-7d3f-8011-b001-000000000001",
+            "url": "https://www.notion.so/Alpha-spec-4c2e9a1b7d3f8011b001000000000001",
+            "in_trash": false,
+            "properties": {
+              "Name": {
+                "id": "title",
+                "type": "title",
+                "title": [
+                  {
+                    "type": "text",
+                    "text": {
+                      "content": "Alpha spec",
+                      "link": null
+                    },
+                    "annotations": {
+                      "bold": false,
+                      "italic": false,
+                      "strikethrough": false,
+                      "underline": false,
+                      "code": false,
+                      "color": "default"
+                    },
+                    "plain_text": "Alpha spec",
+                    "href": null
+                  }
+                ]
+              },
+              "Status": {
+                "id": "St%3Aa",
+                "type": "status",
+                "status": {
+                  "id": "s",
+                  "name": "Final",
+                  "color": "default"
+                }
+              },
+              "Kind": {
+                "id": "Kn%3Ad",
+                "type": "select",
+                "select": {
+                  "id": "k",
+                  "name": "Spec",
+                  "color": "default"
+                }
+              },
+              "Tags": {
+                "id": "Tg%3As",
+                "type": "multi_select",
+                "multi_select": [
+                  {
+                    "id": "api",
+                    "name": "api",
+                    "color": "default"
+                  }
+                ]
+              },
+              "Done": {
+                "id": "Dn%3Ae",
+                "type": "checkbox",
+                "checkbox": true
+              },
+              "Points": {
+                "id": "Pt%3As",
+                "type": "number",
+                "number": 8
+              },
+              "Due": {
+                "id": "Du%3Ae",
+                "type": "date",
+                "date": {
+                  "start": "2026-11-04",
+                  "end": null,
+                  "time_zone": null
+                }
+              },
+              "Notes": {
+                "id": "Nt%3As",
+                "type": "rich_text",
+                "rich_text": [
+                  {
+                    "type": "text",
+                    "text": {
+                      "content": "n",
+                      "link": null
+                    },
+                    "annotations": {
+                      "bold": false,
+                      "italic": false,
+                      "strikethrough": false,
+                      "underline": false,
+                      "code": false,
+                      "color": "default"
+                    },
+                    "plain_text": "n",
+                    "href": null
+                  }
+                ]
+              },
+              "Owners": {
+                "id": "Ow%3An",
+                "type": "people",
+                "people": [
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000001",
+                    "name": "User 1",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user1@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000002",
+                    "name": "User 2",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user2@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000003",
+                    "name": "User 3",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user3@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000004",
+                    "name": "User 4",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user4@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000005",
+                    "name": "User 5",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user5@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000006",
+                    "name": "User 6",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user6@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000007",
+                    "name": "User 7",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user7@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000008",
+                    "name": "User 8",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user8@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000009",
+                    "name": "User 9",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user9@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000010",
+                    "name": "User 10",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user10@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000011",
+                    "name": "User 11",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user11@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000012",
+                    "name": "User 12",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user12@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000013",
+                    "name": "User 13",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user13@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000014",
+                    "name": "User 14",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user14@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000015",
+                    "name": "User 15",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user15@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000016",
+                    "name": "User 16",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user16@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000017",
+                    "name": "User 17",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user17@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000018",
+                    "name": "User 18",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user18@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000019",
+                    "name": "User 19",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user19@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000020",
+                    "name": "User 20",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user20@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000021",
+                    "name": "User 21",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user21@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000022",
+                    "name": "User 22",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user22@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000023",
+                    "name": "User 23",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user23@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000024",
+                    "name": "User 24",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user24@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000025",
+                    "name": "User 25",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user25@example.com"
+                    }
+                  }
+                ]
+              },
+              "Related": {
+                "id": "Rl%3At",
+                "type": "relation",
+                "relation": [
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000002"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000003"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000004"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000005"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000006"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000007"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000008"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000009"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000010"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000011"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000012"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000013"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000014"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000015"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000016"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000017"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000018"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000019"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000020"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000021"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000022"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000023"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000024"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000025"
+                  }
+                ],
+                "has_more": true
+              },
+              "Link": {
+                "id": "Lk%3Ai",
+                "type": "url",
+                "url": null
+              },
+              "Score": {
+                "id": "Sc%3Ar",
+                "type": "formula",
+                "formula": {
+                  "type": "number",
+                  "number": 1
+                }
+              },
+              "Attachments": {
+                "id": "Fl%3As",
+                "type": "files",
+                "files": [
+                  {
+                    "name": "file1.pdf",
+                    "type": "file",
+                    "file": {
+                      "url": "https://files.example.com/file1.pdf",
+                      "expiry_time": "2026-11-18T12:00:00.000Z"
+                    }
+                  },
+                  {
+                    "name": "file2.pdf",
+                    "type": "file",
+                    "file": {
+                      "url": "https://files.example.com/file2.pdf",
+                      "expiry_time": "2026-11-18T12:00:00.000Z"
+                    }
+                  },
+                  {
+                    "name": "file3.pdf",
+                    "type": "file",
+                    "file": {
+                      "url": "https://files.example.com/file3.pdf",
+                      "expiry_time": "2026-11-18T12:00:00.000Z"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "object": "page",
+            "id": "4c2e9a1b-7d3f-8011-b001-000000000002",
+            "url": "https://www.notion.so/Beta-spec-4c2e9a1b7d3f8011b001000000000002",
+            "in_trash": false,
+            "properties": {
+              "Name": {
+                "id": "title",
+                "type": "title",
+                "title": [
+                  {
+                    "type": "text",
+                    "text": {
+                      "content": "Beta spec",
+                      "link": null
+                    },
+                    "annotations": {
+                      "bold": false,
+                      "italic": false,
+                      "strikethrough": false,
+                      "underline": false,
+                      "code": false,
+                      "color": "default"
+                    },
+                    "plain_text": "Beta spec",
+                    "href": null
+                  }
+                ]
+              },
+              "Status": {
+                "id": "St%3Aa",
+                "type": "status",
+                "status": {
+                  "id": "s",
+                  "name": "Draft",
+                  "color": "default"
+                }
+              },
+              "Kind": {
+                "id": "Kn%3Ad",
+                "type": "select",
+                "select": {
+                  "id": "k",
+                  "name": "Spec",
+                  "color": "default"
+                }
+              },
+              "Tags": {
+                "id": "Tg%3As",
+                "type": "multi_select",
+                "multi_select": [
+                  {
+                    "id": "ui",
+                    "name": "ui",
+                    "color": "default"
+                  }
+                ]
+              },
+              "Done": {
+                "id": "Dn%3Ae",
+                "type": "checkbox",
+                "checkbox": false
+              },
+              "Points": {
+                "id": "Pt%3As",
+                "type": "number",
+                "number": 3
+              },
+              "Due": {
+                "id": "Du%3Ae",
+                "type": "date",
+                "date": {
+                  "start": "2026-11-05",
+                  "end": null,
+                  "time_zone": null
+                }
+              },
+              "Notes": {
+                "id": "Nt%3As",
+                "type": "rich_text",
+                "rich_text": [
+                  {
+                    "type": "text",
+                    "text": {
+                      "content": "n",
+                      "link": null
+                    },
+                    "annotations": {
+                      "bold": false,
+                      "italic": false,
+                      "strikethrough": false,
+                      "underline": false,
+                      "code": false,
+                      "color": "default"
+                    },
+                    "plain_text": "n",
+                    "href": null
+                  }
+                ]
+              },
+              "Owners": {
+                "id": "Ow%3An",
+                "type": "people",
+                "people": [
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000001",
+                    "name": "User 1",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user1@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000002",
+                    "name": "User 2",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user2@example.com"
+                    }
+                  }
+                ]
+              },
+              "Related": {
+                "id": "Rl%3At",
+                "type": "relation",
+                "relation": [
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000002"
+                  }
+                ],
+                "has_more": false
+              },
+              "Link": {
+                "id": "Lk%3Ai",
+                "type": "url",
+                "url": null
+              },
+              "Score": {
+                "id": "Sc%3Ar",
+                "type": "formula",
+                "formula": {
+                  "type": "number",
+                  "number": 1
+                }
+              },
+              "Attachments": {
+                "id": "Fl%3As",
+                "type": "files",
+                "files": []
+              }
+            }
+          },
+          {
+            "object": "page",
+            "id": "4c2e9a1b-7d3f-8011-b001-000000000003",
+            "url": "https://www.notion.so/Gamma-spec-4c2e9a1b7d3f8011b001000000000003",
+            "in_trash": false,
+            "properties": {
+              "Name": {
+                "id": "title",
+                "type": "title",
+                "title": [
+                  {
+                    "type": "text",
+                    "text": {
+                      "content": "Gamma spec",
+                      "link": null
+                    },
+                    "annotations": {
+                      "bold": false,
+                      "italic": false,
+                      "strikethrough": false,
+                      "underline": false,
+                      "code": false,
+                      "color": "default"
+                    },
+                    "plain_text": "Gamma spec",
+                    "href": null
+                  }
+                ]
+              },
+              "Status": {
+                "id": "St%3Aa",
+                "type": "status",
+                "status": {
+                  "id": "s",
+                  "name": "Final",
+                  "color": "default"
+                }
+              },
+              "Kind": {
+                "id": "Kn%3Ad",
+                "type": "select",
+                "select": {
+                  "id": "k",
+                  "name": "RFC",
+                  "color": "default"
+                }
+              },
+              "Tags": {
+                "id": "Tg%3As",
+                "type": "multi_select",
+                "multi_select": [
+                  {
+                    "id": "api",
+                    "name": "api",
+                    "color": "default"
+                  },
+                  {
+                    "id": "ui",
+                    "name": "ui",
+                    "color": "default"
+                  }
+                ]
+              },
+              "Done": {
+                "id": "Dn%3Ae",
+                "type": "checkbox",
+                "checkbox": false
+              },
+              "Points": {
+                "id": "Pt%3As",
+                "type": "number",
+                "number": 8
+              },
+              "Due": {
+                "id": "Du%3Ae",
+                "type": "date",
+                "date": {
+                  "start": "2026-11-06",
+                  "end": null,
+                  "time_zone": null
+                }
+              },
+              "Notes": {
+                "id": "Nt%3As",
+                "type": "rich_text",
+                "rich_text": [
+                  {
+                    "type": "text",
+                    "text": {
+                      "content": "n",
+                      "link": null
+                    },
+                    "annotations": {
+                      "bold": false,
+                      "italic": false,
+                      "strikethrough": false,
+                      "underline": false,
+                      "code": false,
+                      "color": "default"
+                    },
+                    "plain_text": "n",
+                    "href": null
+                  }
+                ]
+              },
+              "Owners": {
+                "id": "Ow%3An",
+                "type": "people",
+                "people": [
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000050",
+                    "name": "User 50",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user50@example.com"
+                    }
+                  }
+                ]
+              },
+              "Related": {
+                "id": "Rl%3At",
+                "type": "relation",
+                "relation": [],
+                "has_more": false
+              },
+              "Link": {
+                "id": "Lk%3Ai",
+                "type": "url",
+                "url": null
+              },
+              "Score": {
+                "id": "Sc%3Ar",
+                "type": "formula",
+                "formula": {
+                  "type": "number",
+                  "number": 1
+                }
+              },
+              "Attachments": {
+                "id": "Fl%3As",
+                "type": "files",
+                "files": []
+              }
+            }
+          }
+        ],
+        "next_cursor": null,
+        "has_more": false,
+        "type": "page_or_data_source",
+        "page_or_data_source": {}
+      }
+    ],
+    "POST /v1/data_sources/4c2e9a1b-7d3f-80b2-a5c6-1e8f0b2d4a02/query {\"property\":\"Status\",\"status\":{\"equals\":\"Final\"}}": [
+      {
+        "object": "list",
+        "results": [
+          {
+            "object": "page",
+            "id": "4c2e9a1b-7d3f-8011-b001-000000000001",
+            "url": "https://www.notion.so/Alpha-spec-4c2e9a1b7d3f8011b001000000000001",
+            "in_trash": false,
+            "properties": {
+              "Name": {
+                "id": "title",
+                "type": "title",
+                "title": [
+                  {
+                    "type": "text",
+                    "text": {
+                      "content": "Alpha spec",
+                      "link": null
+                    },
+                    "annotations": {
+                      "bold": false,
+                      "italic": false,
+                      "strikethrough": false,
+                      "underline": false,
+                      "code": false,
+                      "color": "default"
+                    },
+                    "plain_text": "Alpha spec",
+                    "href": null
+                  }
+                ]
+              },
+              "Status": {
+                "id": "St%3Aa",
+                "type": "status",
+                "status": {
+                  "id": "s",
+                  "name": "Final",
+                  "color": "default"
+                }
+              },
+              "Kind": {
+                "id": "Kn%3Ad",
+                "type": "select",
+                "select": {
+                  "id": "k",
+                  "name": "Spec",
+                  "color": "default"
+                }
+              },
+              "Tags": {
+                "id": "Tg%3As",
+                "type": "multi_select",
+                "multi_select": [
+                  {
+                    "id": "api",
+                    "name": "api",
+                    "color": "default"
+                  }
+                ]
+              },
+              "Done": {
+                "id": "Dn%3Ae",
+                "type": "checkbox",
+                "checkbox": true
+              },
+              "Points": {
+                "id": "Pt%3As",
+                "type": "number",
+                "number": 8
+              },
+              "Due": {
+                "id": "Du%3Ae",
+                "type": "date",
+                "date": {
+                  "start": "2026-11-04",
+                  "end": null,
+                  "time_zone": null
+                }
+              },
+              "Notes": {
+                "id": "Nt%3As",
+                "type": "rich_text",
+                "rich_text": [
+                  {
+                    "type": "text",
+                    "text": {
+                      "content": "n",
+                      "link": null
+                    },
+                    "annotations": {
+                      "bold": false,
+                      "italic": false,
+                      "strikethrough": false,
+                      "underline": false,
+                      "code": false,
+                      "color": "default"
+                    },
+                    "plain_text": "n",
+                    "href": null
+                  }
+                ]
+              },
+              "Owners": {
+                "id": "Ow%3An",
+                "type": "people",
+                "people": [
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000001",
+                    "name": "User 1",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user1@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000002",
+                    "name": "User 2",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user2@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000003",
+                    "name": "User 3",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user3@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000004",
+                    "name": "User 4",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user4@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000005",
+                    "name": "User 5",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user5@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000006",
+                    "name": "User 6",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user6@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000007",
+                    "name": "User 7",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user7@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000008",
+                    "name": "User 8",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user8@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000009",
+                    "name": "User 9",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user9@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000010",
+                    "name": "User 10",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user10@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000011",
+                    "name": "User 11",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user11@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000012",
+                    "name": "User 12",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user12@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000013",
+                    "name": "User 13",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user13@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000014",
+                    "name": "User 14",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user14@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000015",
+                    "name": "User 15",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user15@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000016",
+                    "name": "User 16",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user16@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000017",
+                    "name": "User 17",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user17@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000018",
+                    "name": "User 18",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user18@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000019",
+                    "name": "User 19",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user19@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000020",
+                    "name": "User 20",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user20@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000021",
+                    "name": "User 21",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user21@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000022",
+                    "name": "User 22",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user22@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000023",
+                    "name": "User 23",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user23@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000024",
+                    "name": "User 24",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user24@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000025",
+                    "name": "User 25",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user25@example.com"
+                    }
+                  }
+                ]
+              },
+              "Related": {
+                "id": "Rl%3At",
+                "type": "relation",
+                "relation": [
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000002"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000003"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000004"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000005"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000006"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000007"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000008"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000009"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000010"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000011"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000012"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000013"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000014"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000015"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000016"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000017"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000018"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000019"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000020"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000021"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000022"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000023"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000024"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000025"
+                  }
+                ],
+                "has_more": true
+              },
+              "Link": {
+                "id": "Lk%3Ai",
+                "type": "url",
+                "url": null
+              },
+              "Score": {
+                "id": "Sc%3Ar",
+                "type": "formula",
+                "formula": {
+                  "type": "number",
+                  "number": 1
+                }
+              },
+              "Attachments": {
+                "id": "Fl%3As",
+                "type": "files",
+                "files": [
+                  {
+                    "name": "file1.pdf",
+                    "type": "file",
+                    "file": {
+                      "url": "https://files.example.com/file1.pdf",
+                      "expiry_time": "2026-11-18T12:00:00.000Z"
+                    }
+                  },
+                  {
+                    "name": "file2.pdf",
+                    "type": "file",
+                    "file": {
+                      "url": "https://files.example.com/file2.pdf",
+                      "expiry_time": "2026-11-18T12:00:00.000Z"
+                    }
+                  },
+                  {
+                    "name": "file3.pdf",
+                    "type": "file",
+                    "file": {
+                      "url": "https://files.example.com/file3.pdf",
+                      "expiry_time": "2026-11-18T12:00:00.000Z"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "object": "page",
+            "id": "4c2e9a1b-7d3f-8011-b001-000000000003",
+            "url": "https://www.notion.so/Gamma-spec-4c2e9a1b7d3f8011b001000000000003",
+            "in_trash": false,
+            "properties": {
+              "Name": {
+                "id": "title",
+                "type": "title",
+                "title": [
+                  {
+                    "type": "text",
+                    "text": {
+                      "content": "Gamma spec",
+                      "link": null
+                    },
+                    "annotations": {
+                      "bold": false,
+                      "italic": false,
+                      "strikethrough": false,
+                      "underline": false,
+                      "code": false,
+                      "color": "default"
+                    },
+                    "plain_text": "Gamma spec",
+                    "href": null
+                  }
+                ]
+              },
+              "Status": {
+                "id": "St%3Aa",
+                "type": "status",
+                "status": {
+                  "id": "s",
+                  "name": "Final",
+                  "color": "default"
+                }
+              },
+              "Kind": {
+                "id": "Kn%3Ad",
+                "type": "select",
+                "select": {
+                  "id": "k",
+                  "name": "RFC",
+                  "color": "default"
+                }
+              },
+              "Tags": {
+                "id": "Tg%3As",
+                "type": "multi_select",
+                "multi_select": [
+                  {
+                    "id": "api",
+                    "name": "api",
+                    "color": "default"
+                  },
+                  {
+                    "id": "ui",
+                    "name": "ui",
+                    "color": "default"
+                  }
+                ]
+              },
+              "Done": {
+                "id": "Dn%3Ae",
+                "type": "checkbox",
+                "checkbox": false
+              },
+              "Points": {
+                "id": "Pt%3As",
+                "type": "number",
+                "number": 8
+              },
+              "Due": {
+                "id": "Du%3Ae",
+                "type": "date",
+                "date": {
+                  "start": "2026-11-06",
+                  "end": null,
+                  "time_zone": null
+                }
+              },
+              "Notes": {
+                "id": "Nt%3As",
+                "type": "rich_text",
+                "rich_text": [
+                  {
+                    "type": "text",
+                    "text": {
+                      "content": "n",
+                      "link": null
+                    },
+                    "annotations": {
+                      "bold": false,
+                      "italic": false,
+                      "strikethrough": false,
+                      "underline": false,
+                      "code": false,
+                      "color": "default"
+                    },
+                    "plain_text": "n",
+                    "href": null
+                  }
+                ]
+              },
+              "Owners": {
+                "id": "Ow%3An",
+                "type": "people",
+                "people": [
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000050",
+                    "name": "User 50",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user50@example.com"
+                    }
+                  }
+                ]
+              },
+              "Related": {
+                "id": "Rl%3At",
+                "type": "relation",
+                "relation": [],
+                "has_more": false
+              },
+              "Link": {
+                "id": "Lk%3Ai",
+                "type": "url",
+                "url": null
+              },
+              "Score": {
+                "id": "Sc%3Ar",
+                "type": "formula",
+                "formula": {
+                  "type": "number",
+                  "number": 1
+                }
+              },
+              "Attachments": {
+                "id": "Fl%3As",
+                "type": "files",
+                "files": []
+              }
+            }
+          }
+        ],
+        "next_cursor": null,
+        "has_more": false,
+        "type": "page_or_data_source",
+        "page_or_data_source": {}
+      }
+    ],
+    "POST /v1/data_sources/4c2e9a1b-7d3f-80b2-a5c6-1e8f0b2d4a02/query {\"and\":[{\"property\":\"Status\",\"status\":{\"equals\":\"Final\"}},{\"property\":\"Done\",\"checkbox\":{\"equals\":true}}]}": [
+      {
+        "object": "list",
+        "results": [
+          {
+            "object": "page",
+            "id": "4c2e9a1b-7d3f-8011-b001-000000000001",
+            "url": "https://www.notion.so/Alpha-spec-4c2e9a1b7d3f8011b001000000000001",
+            "in_trash": false,
+            "properties": {
+              "Name": {
+                "id": "title",
+                "type": "title",
+                "title": [
+                  {
+                    "type": "text",
+                    "text": {
+                      "content": "Alpha spec",
+                      "link": null
+                    },
+                    "annotations": {
+                      "bold": false,
+                      "italic": false,
+                      "strikethrough": false,
+                      "underline": false,
+                      "code": false,
+                      "color": "default"
+                    },
+                    "plain_text": "Alpha spec",
+                    "href": null
+                  }
+                ]
+              },
+              "Status": {
+                "id": "St%3Aa",
+                "type": "status",
+                "status": {
+                  "id": "s",
+                  "name": "Final",
+                  "color": "default"
+                }
+              },
+              "Kind": {
+                "id": "Kn%3Ad",
+                "type": "select",
+                "select": {
+                  "id": "k",
+                  "name": "Spec",
+                  "color": "default"
+                }
+              },
+              "Tags": {
+                "id": "Tg%3As",
+                "type": "multi_select",
+                "multi_select": [
+                  {
+                    "id": "api",
+                    "name": "api",
+                    "color": "default"
+                  }
+                ]
+              },
+              "Done": {
+                "id": "Dn%3Ae",
+                "type": "checkbox",
+                "checkbox": true
+              },
+              "Points": {
+                "id": "Pt%3As",
+                "type": "number",
+                "number": 8
+              },
+              "Due": {
+                "id": "Du%3Ae",
+                "type": "date",
+                "date": {
+                  "start": "2026-11-04",
+                  "end": null,
+                  "time_zone": null
+                }
+              },
+              "Notes": {
+                "id": "Nt%3As",
+                "type": "rich_text",
+                "rich_text": [
+                  {
+                    "type": "text",
+                    "text": {
+                      "content": "n",
+                      "link": null
+                    },
+                    "annotations": {
+                      "bold": false,
+                      "italic": false,
+                      "strikethrough": false,
+                      "underline": false,
+                      "code": false,
+                      "color": "default"
+                    },
+                    "plain_text": "n",
+                    "href": null
+                  }
+                ]
+              },
+              "Owners": {
+                "id": "Ow%3An",
+                "type": "people",
+                "people": [
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000001",
+                    "name": "User 1",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user1@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000002",
+                    "name": "User 2",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user2@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000003",
+                    "name": "User 3",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user3@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000004",
+                    "name": "User 4",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user4@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000005",
+                    "name": "User 5",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user5@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000006",
+                    "name": "User 6",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user6@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000007",
+                    "name": "User 7",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user7@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000008",
+                    "name": "User 8",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user8@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000009",
+                    "name": "User 9",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user9@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000010",
+                    "name": "User 10",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user10@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000011",
+                    "name": "User 11",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user11@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000012",
+                    "name": "User 12",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user12@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000013",
+                    "name": "User 13",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user13@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000014",
+                    "name": "User 14",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user14@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000015",
+                    "name": "User 15",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user15@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000016",
+                    "name": "User 16",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user16@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000017",
+                    "name": "User 17",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user17@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000018",
+                    "name": "User 18",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user18@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000019",
+                    "name": "User 19",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user19@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000020",
+                    "name": "User 20",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user20@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000021",
+                    "name": "User 21",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user21@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000022",
+                    "name": "User 22",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user22@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000023",
+                    "name": "User 23",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user23@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000024",
+                    "name": "User 24",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user24@example.com"
+                    }
+                  },
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000025",
+                    "name": "User 25",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user25@example.com"
+                    }
+                  }
+                ]
+              },
+              "Related": {
+                "id": "Rl%3At",
+                "type": "relation",
+                "relation": [
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000002"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000003"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000004"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000005"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000006"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000007"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000008"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000009"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000010"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000011"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000012"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000013"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000014"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000015"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000016"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000017"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000018"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000019"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000020"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000021"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000022"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000023"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000024"
+                  },
+                  {
+                    "id": "6e4a1c3d-0000-4000-8000-000000000025"
+                  }
+                ],
+                "has_more": true
+              },
+              "Link": {
+                "id": "Lk%3Ai",
+                "type": "url",
+                "url": null
+              },
+              "Score": {
+                "id": "Sc%3Ar",
+                "type": "formula",
+                "formula": {
+                  "type": "number",
+                  "number": 1
+                }
+              },
+              "Attachments": {
+                "id": "Fl%3As",
+                "type": "files",
+                "files": [
+                  {
+                    "name": "file1.pdf",
+                    "type": "file",
+                    "file": {
+                      "url": "https://files.example.com/file1.pdf",
+                      "expiry_time": "2026-11-18T12:00:00.000Z"
+                    }
+                  },
+                  {
+                    "name": "file2.pdf",
+                    "type": "file",
+                    "file": {
+                      "url": "https://files.example.com/file2.pdf",
+                      "expiry_time": "2026-11-18T12:00:00.000Z"
+                    }
+                  },
+                  {
+                    "name": "file3.pdf",
+                    "type": "file",
+                    "file": {
+                      "url": "https://files.example.com/file3.pdf",
+                      "expiry_time": "2026-11-18T12:00:00.000Z"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "object": "page",
+            "id": "4c2e9a1b-7d3f-8011-b001-000000000003",
+            "url": "https://www.notion.so/Gamma-spec-4c2e9a1b7d3f8011b001000000000003",
+            "in_trash": false,
+            "properties": {
+              "Name": {
+                "id": "title",
+                "type": "title",
+                "title": [
+                  {
+                    "type": "text",
+                    "text": {
+                      "content": "Gamma spec",
+                      "link": null
+                    },
+                    "annotations": {
+                      "bold": false,
+                      "italic": false,
+                      "strikethrough": false,
+                      "underline": false,
+                      "code": false,
+                      "color": "default"
+                    },
+                    "plain_text": "Gamma spec",
+                    "href": null
+                  }
+                ]
+              },
+              "Status": {
+                "id": "St%3Aa",
+                "type": "status",
+                "status": {
+                  "id": "s",
+                  "name": "Final",
+                  "color": "default"
+                }
+              },
+              "Kind": {
+                "id": "Kn%3Ad",
+                "type": "select",
+                "select": {
+                  "id": "k",
+                  "name": "RFC",
+                  "color": "default"
+                }
+              },
+              "Tags": {
+                "id": "Tg%3As",
+                "type": "multi_select",
+                "multi_select": [
+                  {
+                    "id": "api",
+                    "name": "api",
+                    "color": "default"
+                  },
+                  {
+                    "id": "ui",
+                    "name": "ui",
+                    "color": "default"
+                  }
+                ]
+              },
+              "Done": {
+                "id": "Dn%3Ae",
+                "type": "checkbox",
+                "checkbox": false
+              },
+              "Points": {
+                "id": "Pt%3As",
+                "type": "number",
+                "number": 8
+              },
+              "Due": {
+                "id": "Du%3Ae",
+                "type": "date",
+                "date": {
+                  "start": "2026-11-06",
+                  "end": null,
+                  "time_zone": null
+                }
+              },
+              "Notes": {
+                "id": "Nt%3As",
+                "type": "rich_text",
+                "rich_text": [
+                  {
+                    "type": "text",
+                    "text": {
+                      "content": "n",
+                      "link": null
+                    },
+                    "annotations": {
+                      "bold": false,
+                      "italic": false,
+                      "strikethrough": false,
+                      "underline": false,
+                      "code": false,
+                      "color": "default"
+                    },
+                    "plain_text": "n",
+                    "href": null
+                  }
+                ]
+              },
+              "Owners": {
+                "id": "Ow%3An",
+                "type": "people",
+                "people": [
+                  {
+                    "object": "user",
+                    "id": "5d3f0b2c-0000-4000-8000-000000000050",
+                    "name": "User 50",
+                    "avatar_url": null,
+                    "type": "person",
+                    "person": {
+                      "email": "user50@example.com"
+                    }
+                  }
+                ]
+              },
+              "Related": {
+                "id": "Rl%3At",
+                "type": "relation",
+                "relation": [],
+                "has_more": false
+              },
+              "Link": {
+                "id": "Lk%3Ai",
+                "type": "url",
+                "url": null
+              },
+              "Score": {
+                "id": "Sc%3Ar",
+                "type": "formula",
+                "formula": {
+                  "type": "number",
+                  "number": 1
+                }
+              },
+              "Attachments": {
+                "id": "Fl%3As",
+                "type": "files",
+                "files": []
+              }
+            }
+          }
+        ],
+        "next_cursor": null,
+        "has_more": false,
+        "type": "page_or_data_source",
+        "page_or_data_source": {}
+      }
+    ],
+    "GET /v1/pages/4c2e9a1b-7d3f-8011-b001-000000000001/properties/Ow%3An": [
+      {
+        "object": "list",
+        "results": [
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000001",
+              "name": "User 1",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user1@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000002",
+              "name": "User 2",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user2@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000003",
+              "name": "User 3",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user3@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000004",
+              "name": "User 4",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user4@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000005",
+              "name": "User 5",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user5@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000006",
+              "name": "User 6",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user6@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000007",
+              "name": "User 7",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user7@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000008",
+              "name": "User 8",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user8@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000009",
+              "name": "User 9",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user9@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000010",
+              "name": "User 10",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user10@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000011",
+              "name": "User 11",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user11@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000012",
+              "name": "User 12",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user12@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000013",
+              "name": "User 13",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user13@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000014",
+              "name": "User 14",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user14@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000015",
+              "name": "User 15",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user15@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000016",
+              "name": "User 16",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user16@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000017",
+              "name": "User 17",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user17@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000018",
+              "name": "User 18",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user18@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000019",
+              "name": "User 19",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user19@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000020",
+              "name": "User 20",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user20@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000021",
+              "name": "User 21",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user21@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000022",
+              "name": "User 22",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user22@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000023",
+              "name": "User 23",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user23@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000024",
+              "name": "User 24",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user24@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000025",
+              "name": "User 25",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user25@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000026",
+              "name": "User 26",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user26@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000027",
+              "name": "User 27",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user27@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000028",
+              "name": "User 28",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user28@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000029",
+              "name": "User 29",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user29@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000030",
+              "name": "User 30",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user30@example.com"
+              }
+            }
+          }
+        ],
+        "next_cursor": "cur-2",
+        "has_more": true,
+        "type": "property_item",
+        "property_item": {
+          "id": "x",
+          "next_url": null,
+          "type": "people",
+          "people": {}
+        }
+      },
+      {
+        "object": "list",
+        "results": [
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000031",
+              "name": "User 31",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user31@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000032",
+              "name": "User 32",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user32@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000033",
+              "name": "User 33",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user33@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000034",
+              "name": "User 34",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user34@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000035",
+              "name": "User 35",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user35@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000036",
+              "name": "User 36",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user36@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000037",
+              "name": "User 37",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user37@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000038",
+              "name": "User 38",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user38@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000039",
+              "name": "User 39",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user39@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000040",
+              "name": "User 40",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user40@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000041",
+              "name": "User 41",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user41@example.com"
+              }
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "people",
+            "people": {
+              "object": "user",
+              "id": "5d3f0b2c-0000-4000-8000-000000000042",
+              "name": "User 42",
+              "avatar_url": null,
+              "type": "person",
+              "person": {
+                "email": "user42@example.com"
+              }
+            }
+          }
+        ],
+        "next_cursor": null,
+        "has_more": false,
+        "type": "property_item",
+        "property_item": {
+          "id": "x",
+          "next_url": null,
+          "type": "people",
+          "people": {}
+        }
+      }
+    ],
+    "GET /v1/pages/4c2e9a1b-7d3f-8011-b001-000000000001/properties/Rl%3At": [
+      {
+        "object": "list",
+        "results": [
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000001"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000002"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000003"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000004"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000005"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000006"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000007"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000008"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000009"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000010"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000011"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000012"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000013"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000014"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000015"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000016"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000017"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000018"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000019"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000020"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000021"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000022"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000023"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000024"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000025"
+            }
+          }
+        ],
+        "next_cursor": "cur-2",
+        "has_more": true,
+        "type": "property_item",
+        "property_item": {
+          "id": "x",
+          "next_url": null,
+          "type": "relation",
+          "relation": {}
+        }
+      },
+      {
+        "object": "list",
+        "results": [
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000026"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000027"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000028"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000029"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000030"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000031"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000032"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000033"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000034"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000035"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000036"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000037"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000038"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000039"
+            }
+          },
+          {
+            "object": "property_item",
+            "id": "x",
+            "type": "relation",
+            "relation": {
+              "id": "6e4a1c3d-0000-4000-8000-000000000040"
+            }
+          }
+        ],
+        "next_cursor": null,
+        "has_more": false,
+        "type": "property_item",
+        "property_item": {
+          "id": "x",
+          "next_url": null,
+          "type": "relation",
+          "relation": {}
+        }
+      }
+    ],
+    "GET /v1/pages/4c2e9a1b-7d3f-8011-b001-000000000001/properties/title": [
+      {
+        "object": "list",
+        "results": [
+          {
+            "object": "property_item",
+            "id": "title",
+            "type": "title",
+            "title": {
+              "type": "text",
+              "text": {
+                "content": "Alpha spec",
+                "link": null
+              },
+              "annotations": {
+                "bold": false,
+                "italic": false,
+                "strikethrough": false,
+                "underline": false,
+                "code": false,
+                "color": "default"
+              },
+              "plain_text": "Alpha spec",
+              "href": null
+            }
+          }
+        ],
+        "next_cursor": null,
+        "has_more": false,
+        "type": "property_item",
+        "property_item": {
+          "id": "x",
+          "next_url": null,
+          "type": "title",
+          "title": {}
+        }
+      }
+    ],
+    "GET /v1/blocks/4c2e9a1b-7d3f-8011-b001-000000000001/children": [
+      {
+        "object": "list",
+        "results": [],
+        "next_cursor": null,
+        "has_more": false
+      }
+    ],
+    "GET /v1/blocks/4c2e9a1b-7d3f-8011-b001-000000000002/children": [
+      {
+        "object": "list",
+        "results": [],
+        "next_cursor": null,
+        "has_more": false
+      }
+    ],
+    "GET /v1/blocks/4c2e9a1b-7d3f-8011-b001-000000000003/children": [
+      {
+        "object": "list",
+        "results": [],
+        "next_cursor": null,
+        "has_more": false
+      }
+    ]
+  }
+}

@@ -42,7 +42,9 @@ How the body is matched:
 - The type's `body` headings are mapped in order to the page's headings by name (exact text, or `{ "pattern": ... }`). Rules: `body.missing`, `body.order` (the longest in-order run is kept, the rest are reported), `body.level`, and `body.extra` when `headings.allowExtra` is false (at the top level, and under headings whose `children` are given). `headings.noSkipLevel` reports `headings.skipLevel`.
 - Block entries such as `{ "block": "list", "min": 1 }` are matched in order against the blocks before the first sub-heading at that level; each takes the next run of consecutive blocks of its kind (`body.min`, `body.max`). Empty paragraphs are ignored.
 - With `numbering`, a section number written in the heading's `format` is removed before names are compared.
-- A checkbox property with `required: true` must be checked. People, files, and relation lists longer than 25 are truncated by the API, so `min` is not reported for them.
+- A checkbox property with `required: true` must be checked.
+- Page objects hold at most 25 items of a `people`, `files`, `relation`, `title` or `rich_text` value. When a property the type (or a `where`) names may be cut short, the full value is read with the page property endpoint, so `min` and `max` are exact for any length.
+- `where` is sent to Notion as a query filter when the data source's schema allows it: status / select / url / email / phone / title / rich_text / number / date `equals`, multi_select `contains`, checkbox `equals`, and people / relation `contains` (the value must be an ID). Conditions that cannot be translated (a property the data source lacks, a formula or files property, a value of the wrong shape) are applied locally, and every condition is applied locally to the returned pages as well, so the filter only saves requests. People and relation conditions need an ID.
 
 Section numbers (`numbering`):
 

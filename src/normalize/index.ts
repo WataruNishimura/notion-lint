@@ -1,5 +1,6 @@
 import type { RawBlockTree } from "../notion/fetch.js";
 import { parseNotionId } from "../notion/id.js";
+import { mayBeTruncated } from "../notion/long-values.js";
 import type { BodyItem, HeadingItem, NotionLink, PageModel, PropertyValue } from "./model.js";
 
 /**
@@ -68,9 +69,18 @@ export function normalizeProperty(raw: Json): PropertyValue {
       return { type, start: str(date.start), end: str(date.end) };
     }
     case "people":
-    case "files":
     case "relation":
-      return { type, count: array(value).length, hasMore: raw.has_more === true };
+      return {
+        type,
+        count: array(value).length,
+        hasMore: mayBeTruncated(raw),
+        ids: array(value)
+          .map((item) => str(record(item).id))
+          .filter((id): id is string => id !== null)
+          .map((id) => parseNotionId(id) ?? id),
+      };
+    case "files":
+      return { type, count: array(value).length, hasMore: mayBeTruncated(raw) };
     case "checkbox":
       return { type, checked: value === true };
     default:
