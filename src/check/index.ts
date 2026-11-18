@@ -15,7 +15,7 @@ import type {
 import { type PreparedTextlint, prepareTextlint, TextlintSetupError } from "../text/textlint.js";
 import { checkPage, type Finding, needsBody, skippedParts } from "../validate/index.js";
 import { skeletonFromTemplate, withTemplateBody } from "../validate/template.js";
-import { checkOutsideLinks, type LinkCache } from "./links.js";
+import { type CheckedPages, checkedKey, checkOutsideLinks, type LinkCache } from "./links.js";
 
 /**
  * `check`: decide which pages to check, fetch them, normalize, match against their types,
@@ -110,6 +110,10 @@ export async function runCheck(
   const textlints = plans.map((plan) => loadTextlint(plan, options.baseDir ?? process.cwd()));
   const templates = new Map<string, Promise<BodyItem[]>>();
   const linkTargets: LinkCache = new Map();
+  // Pages are all fetched and matched first, so that links between checked pages can be
+  // checked against each other's headings without fetching a page again.
+  const checked: CheckedPages = new Map();
+  const fetched: { page: PageModel; type: DocType; findings: Finding[]; text: Finding[] }[] = [];
 
   for (const [planIndex, rawPlan] of plans.entries()) {
     const plan = { ...rawPlan, type: await resolveTemplate(rawPlan, fetcher, templates) };
@@ -124,12 +128,22 @@ export async function runCheck(
       const id = typeof raw.id === "string" ? raw.id : "";
       const blocks = needsBody(plan.type) ? await fetcher.blocks(id) : [];
       const page = normalizePage(raw, blocks);
-      const findings = checkPage(page, plan.type);
-      findings.push(...(await checkOutsideLinks(page, plan.type, fetcher, linkTargets)));
       const textlint = textlints[planIndex];
-      if (textlint !== undefined) findings.push(...(await textFindings(textlint, page)));
-      results.push(pageResult(page, plan.type, findings));
+      fetched.push({
+        page,
+        type: plan.type,
+        findings: checkPage(page, plan.type),
+        text: textlint === undefined ? [] : await textFindings(textlint, page),
+      });
+      const key = checkedKey(page.id);
+      if (!checked.has(key)) {
+        checked.set(key, { page, type: plan.type, hasBody: needsBody(plan.type) });
+      }
     }
+  }
+  for (const { page, type, findings, text } of fetched) {
+    findings.push(...(await checkOutsideLinks(page, type, fetcher, linkTargets, checked)), ...text);
+    results.push(pageResult(page, type, findings));
   }
 
   const violations = results.flatMap((page) => page.violations);
