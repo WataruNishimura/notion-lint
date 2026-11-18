@@ -76,12 +76,16 @@ function escapeProperty(text: string): string {
   return escapeData(text).replace(/:/g, "%3A").replace(/,/g, "%2C");
 }
 
-function annotation(page: { title?: string | undefined }, violation: Violation): string {
+function annotation(
+  page: { title?: string | undefined; url: string },
+  violation: Violation,
+): string {
   const level = violation.severity === "error" ? "error" : "warning";
   const title = escapeProperty(`notion-lint ${violation.path}`);
   const name = page.title === undefined || page.title === "" ? "(untitled)" : page.title;
-  const link = violation.url === undefined ? "" : ` ${violation.url}`;
-  return `::${level} title=${title}::${escapeData(`${name}: ${violation.message}${link}`)}`;
+  // Every annotation links to Notion: the block when the violation has one, otherwise the page.
+  const link = violation.url ?? page.url;
+  return `::${level} title=${title}::${escapeData(`${name}: ${violation.message} ${link}`)}`;
 }
 
 /** GitHub Actions annotations: one `::error` / `::warning` per violation, `::notice` per note. */
