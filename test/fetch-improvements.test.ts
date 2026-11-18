@@ -83,10 +83,9 @@ describe("buildFilter", () => {
   });
 
   it("leaves out conditions it cannot translate", () => {
-    // Unknown property, unsupported type (formula, files), and values of the wrong shape.
+    // Unknown property, a formula without a known result type, and values of the wrong shape.
     expect(buildFilter(types, { Missing: "x" })).toBeUndefined();
     expect(buildFilter(types, { Score: 1 })).toBeUndefined();
-    expect(buildFilter(types, { Attachments: "a" })).toBeUndefined();
     expect(buildFilter(types, { Points: "n/a" })).toBeUndefined();
     expect(buildFilter(types, { Due: "next week" })).toBeUndefined();
     expect(buildFilter(types, { Owners: "Aki" })).toBeUndefined();

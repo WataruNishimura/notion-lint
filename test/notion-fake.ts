@@ -71,6 +71,7 @@ export function replayApi(
       );
     },
     retrieveDataSource: async ({ data_source_id }) => one(`GET /v1/data_sources/${data_source_id}`),
+    retrieveDatabase: async ({ database_id }) => one(`GET /v1/databases/${database_id}`),
     // `GET /v1/pages/<id>/properties/<property id>` replays like any list endpoint.
     retrievePropertyItem: async ({ page_id, property_id, start_cursor }) =>
       list(`GET /v1/pages/${page_id}/properties/${property_id}`, start_cursor),

@@ -1,7 +1,8 @@
 import { normalizePage } from "../normalize/index.js";
 import type { BodyItem, PageModel, PropertyValue } from "../normalize/model.js";
+import { DataSourceChoiceError, DataSourceResolver } from "../notion/data-source.js";
 import { NotionApiError, type PageFetcher } from "../notion/fetch.js";
-import { buildFilter, propertyTypes } from "../notion/filter.js";
+import { buildFilter, needsShapes, propertyTypes, resultShapes } from "../notion/filter.js";
 import { parseNotionId } from "../notion/id.js";
 import { withFullProperties } from "../notion/long-values.js";
 import { joinPath } from "../path.js";
@@ -18,6 +19,7 @@ import { type PreparedTextlint, prepareTextlint, TextlintSetupError } from "../t
 import { checkPage, type Finding, needsBody, skippedParts } from "../validate/index.js";
 import { skeletonFromTemplate, withTemplateBody } from "../validate/template.js";
 import { type CheckedPages, checkedKey, checkOutsideLinks, type LinkCache } from "./links.js";
+import { compareFiles, compareFormula, compareRollup } from "./where.js";
 
 /**
  * `check`: decide which pages to check, fetch them, normalize, match against their types,
@@ -45,6 +47,8 @@ export type Plan =
       type: DocType;
       typePath: string;
       wherePath: string;
+      /** Where the data source is written in the config, for errors (`targets[0].dataSource`). */
+      dataSourcePath: string;
     };
 
 /** Throws `CheckError` for a config that names nothing to check or an invalid ID. */
@@ -78,7 +82,7 @@ export function planCheck(config: Config, pages: string[]): Plan[] {
       }
       return { kind: "page", pageId, type: target.type, typePath };
     }
-    const dataSourceId = parseNotionId(target.dataSource);
+    const dataSourceId = parseNotionId(target.dataSource, { peek: false });
     if (dataSourceId === undefined) {
       throw new CheckError(
         "config",
@@ -92,6 +96,7 @@ export function planCheck(config: Config, pages: string[]): Plan[] {
       type: target.type,
       typePath,
       wherePath: joinPath(base, "where"),
+      dataSourcePath: joinPath(base, "dataSource"),
     };
   });
 }
@@ -112,6 +117,7 @@ export async function runCheck(
   const textlints = plans.map((plan) => loadTextlint(plan, options.baseDir ?? process.cwd()));
   const templates = new Map<string, Promise<BodyItem[]>>();
   const linkTargets: LinkCache = new Map();
+  const dataSources = new DataSourceResolver(fetcher);
   // Pages are all fetched and matched first, so that links between checked pages can be
   // checked against each other's headings without fetching a page again.
   const checked: CheckedPages = new Map();
@@ -123,7 +129,7 @@ export async function runCheck(
     const rawPages =
       plan.kind === "page"
         ? [await fetcher.page(plan.pageId)]
-        : await dataSourcePages(plan, fetcher);
+        : await dataSourcePages(plan, fetcher, dataSources);
     // Property lists the type or `where` looks at are read in full (page objects stop at 25).
     const listed = [...Object.keys(plan.type.properties ?? {})];
     if (plan.kind === "dataSource") listed.push(...Object.keys(plan.where ?? {}));
@@ -264,23 +270,59 @@ function pageResult(page: PageModel, type: DocType, findings: Finding[]): PageRe
  * The pages of a data source target. `where` is sent to Notion as a query filter as far as
  * the data source's schema allows. The filter only narrows the query: every condition is
  * also checked here on the pages that come back, so the result does not depend on it.
+ * The configured ID may be a database ID; `DataSourceResolver` finds its data source.
  */
 async function dataSourcePages(
   plan: Extract<Plan, { kind: "dataSource" }>,
+  fetcher: PageFetcher,
+  dataSources: DataSourceResolver,
+): Promise<Record<string, unknown>[]> {
+  let pages: Record<string, unknown>[];
+  try {
+    pages = await dataSources.use(plan.dataSourceId, (id) => queryPages(plan, id, fetcher));
+  } catch (error) {
+    if (error instanceof DataSourceChoiceError) {
+      throw new CheckError(
+        "config",
+        `${plan.dataSourcePath}: ${error.message}`,
+        error.candidates.length === 0 ? "no_data_source" : "ambiguous_database",
+      );
+    }
+    throw error;
+  }
+  return pages.filter((raw) => whereMatches(normalizePage(raw), plan.where, plan.wherePath));
+}
+
+async function queryPages(
+  plan: Extract<Plan, { kind: "dataSource" }>,
+  dataSourceId: string,
   fetcher: PageFetcher,
 ): Promise<Record<string, unknown>[]> {
   let filter: Record<string, unknown> | undefined;
   if (Object.keys(plan.where ?? {}).length > 0) {
     try {
-      filter = buildFilter(propertyTypes(await fetcher.dataSource(plan.dataSourceId)), plan.where);
+      const types = propertyTypes(await fetcher.dataSource(dataSourceId));
+      // Formula and rollup filters depend on what the property yields, which the schema does
+      // not say; a few pages show it.
+      const shapes = needsShapes(types, plan.where)
+        ? resultShapes(types, plan.where, await fetcher.dataSourceSample(dataSourceId))
+        : undefined;
+      filter = buildFilter(types, plan.where, shapes);
     } catch (error) {
-      // Without a schema, query everything and filter here. A real access problem shows up
-      // again as the query's own error.
+      // Without a schema, query everything and filter here. A real access problem, or an ID
+      // that is a database, shows up again as the query's own error.
       if (!(error instanceof NotionApiError)) throw error;
     }
   }
-  const pages = await fetcher.dataSourcePages(plan.dataSourceId, filter);
-  return pages.filter((raw) => whereMatches(normalizePage(raw), plan.where, plan.wherePath));
+  try {
+    return await fetcher.dataSourcePages(dataSourceId, filter);
+  } catch (error) {
+    // A filter Notion rejects (400) must not fail the check: the local comparison does the same.
+    if (filter !== undefined && error instanceof NotionApiError && error.status === 400) {
+      return fetcher.dataSourcePages(dataSourceId);
+    }
+    throw error;
+  }
 }
 
 /**
@@ -340,6 +382,12 @@ function compare(value: PropertyValue, expected: string | number | boolean): boo
       // A cut-short list may hold the ID beyond its 25 items; keep the page until it is complete.
       return (value.ids ?? []).includes(id) || value.hasMore;
     }
+    case "files":
+      return compareFiles(value, expected);
+    case "formula":
+      return compareFormula(value, expected);
+    case "rollup":
+      return compareRollup(value, expected, compare);
     default:
       return undefined;
   }

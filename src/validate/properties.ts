@@ -147,6 +147,8 @@ function isEmpty(value: PropertyValue): boolean {
       return value.count === 0;
     case "checkbox":
       return !value.checked;
+    case "formula":
+    case "rollup":
     case "unsupported":
       return false;
   }
