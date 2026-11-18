@@ -17,6 +17,12 @@ workflow copies the section whose heading starts with the tag's version into the
 - `dataSource` accepts a database ID or URL. A database with one data source is resolved; with
   several, the run exits with code 2 and lists their names and IDs. `--page` does the same for an
   ID that is not a page: every page of the database or data source is checked.
+- `{page}` in `references.patterns`: text references that name another page, such as a page
+  mention followed by a section number (`@Spec 3.2`) or `仕様書の3章`, are matched against the
+  headings of that page when it is checked in the same run.
+- textlint runs on table cells (reported on the row block, with the row and column) and on
+  formatted text: bold, italic and link text are linted; inline code, equations, mentions and
+  URLs are not.
 
 ## 0.1.0 - 2026-11-18
 
