@@ -164,7 +164,7 @@
               "minItems": 1,
               "type": "array",
               "items": {
-                "description": "Reference forms in the body. A string is a template containing {n} (section number) and {title} (heading), e.g. \"see section {n}\" or {n} \"{title}\"; it matches case-insensitively, and whitespace matches any whitespace. A {title} between punctuation such as quotes takes any text up to the closing character; elsewhere it only matches existing heading titles. { pattern } is a regex with named groups n and title",
+                "description": "Reference forms in the body. A string is a template containing {n} (section number) and {title} (heading), e.g. \"see section {n}\" or {n} \"{title}\"; it matches case-insensitively, and whitespace matches any whitespace. A {title} between punctuation such as quotes takes any text up to the closing character; elsewhere it only matches existing heading titles. {page} names the page the section is on: a page mention, or the title of a page checked in the same run (case-insensitive; quotes or brackets around it are ignored); the number and title are then matched against the headings of that page, and a page that is not checked, or a title several checked pages share, is not checked. Patterns with {page} are tried before the others. { pattern } is a regex with named groups n, title and page",
                 "type": [
                   "string",
                   "object"

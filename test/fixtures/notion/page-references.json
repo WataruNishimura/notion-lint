@@ -1,0 +1,1393 @@
+{
+  "description": "Notion API responses (version 2025-09-03) for text references that name another page: a page with mentions followed by section numbers, Japanese '{page}の{n}章' text, an ambiguous title (two pages titled Glossary), and a mention of a page that is not checked",
+  "ids": {
+    "notes": "7a5b0c1d-2e3f-8033-e003-000000000001",
+    "spec": "7a5b0c1d-2e3f-8033-e003-000000000002",
+    "shiyou": "7a5b0c1d-2e3f-8033-e003-000000000003",
+    "glossaryA": "7a5b0c1d-2e3f-8033-e003-000000000004",
+    "glossaryB": "7a5b0c1d-2e3f-8033-e003-000000000005",
+    "history": "7a5b0c1d-2e3f-8033-e003-000000000006"
+  },
+  "responses": {
+    "GET /v1/pages/7a5b0c1d-2e3f-8033-e003-000000000001": {
+      "object": "page",
+      "id": "7a5b0c1d-2e3f-8033-e003-000000000001",
+      "created_time": "2026-11-18T02:00:00.000Z",
+      "last_edited_time": "2026-11-18T02:00:00.000Z",
+      "created_by": {
+        "object": "user",
+        "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+      },
+      "last_edited_by": {
+        "object": "user",
+        "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+      },
+      "cover": null,
+      "icon": null,
+      "parent": {
+        "type": "workspace",
+        "workspace": true
+      },
+      "archived": false,
+      "in_trash": false,
+      "is_locked": false,
+      "properties": {
+        "title": {
+          "id": "title",
+          "type": "title",
+          "title": [
+            {
+              "type": "text",
+              "text": {
+                "content": "Design notes",
+                "link": null
+              },
+              "annotations": {
+                "bold": false,
+                "italic": false,
+                "strikethrough": false,
+                "underline": false,
+                "code": false,
+                "color": "default"
+              },
+              "plain_text": "Design notes",
+              "href": null
+            }
+          ]
+        }
+      },
+      "url": "https://www.notion.so/Design-notes-7a5b0c1d2e3f8033e003000000000001",
+      "public_url": null,
+      "request_id": "req-text-extras"
+    },
+    "GET /v1/blocks/7a5b0c1d-2e3f-8033-e003-000000000001/children": [
+      {
+        "object": "list",
+        "results": [
+          {
+            "object": "block",
+            "id": "7a5b0c1d-2e3f-8000-e001-000000000101",
+            "parent": {
+              "type": "page_id",
+              "page_id": "7a5b0c1d-2e3f-8033-e003-000000000001"
+            },
+            "created_time": "2026-11-18T02:00:00.000Z",
+            "last_edited_time": "2026-11-18T02:00:00.000Z",
+            "created_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "last_edited_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "has_children": false,
+            "archived": false,
+            "in_trash": false,
+            "type": "heading_1",
+            "heading_1": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "1. Overview",
+                    "link": null
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": "1. Overview",
+                  "href": null
+                }
+              ],
+              "is_toggleable": false,
+              "color": "default"
+            }
+          },
+          {
+            "object": "block",
+            "id": "7a5b0c1d-2e3f-8000-e001-000000000102",
+            "parent": {
+              "type": "page_id",
+              "page_id": "7a5b0c1d-2e3f-8033-e003-000000000001"
+            },
+            "created_time": "2026-11-18T02:00:00.000Z",
+            "last_edited_time": "2026-11-18T02:00:00.000Z",
+            "created_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "last_edited_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "has_children": false,
+            "archived": false,
+            "in_trash": false,
+            "type": "paragraph",
+            "paragraph": {
+              "rich_text": [
+                {
+                  "type": "mention",
+                  "mention": {
+                    "type": "page",
+                    "page": {
+                      "id": "7a5b0c1d-2e3f-8033-e003-000000000002"
+                    }
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": "Spec",
+                  "href": "https://www.notion.so/7a5b0c1d2e3f8033e003000000000002"
+                },
+                {
+                  "type": "text",
+                  "text": {
+                    "content": " 2.1 \"Rate limits\" covers the limits.",
+                    "link": null
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": " 2.1 \"Rate limits\" covers the limits.",
+                  "href": null
+                }
+              ],
+              "color": "default"
+            }
+          },
+          {
+            "object": "block",
+            "id": "7a5b0c1d-2e3f-8000-e001-000000000103",
+            "parent": {
+              "type": "page_id",
+              "page_id": "7a5b0c1d-2e3f-8033-e003-000000000001"
+            },
+            "created_time": "2026-11-18T02:00:00.000Z",
+            "last_edited_time": "2026-11-18T02:00:00.000Z",
+            "created_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "last_edited_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "has_children": false,
+            "archived": false,
+            "in_trash": false,
+            "type": "paragraph",
+            "paragraph": {
+              "rich_text": [
+                {
+                  "type": "mention",
+                  "mention": {
+                    "type": "page",
+                    "page": {
+                      "id": "7a5b0c1d-2e3f-8033-e003-000000000002"
+                    }
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": "Spec",
+                  "href": "https://www.notion.so/7a5b0c1d2e3f8033e003000000000002"
+                },
+                {
+                  "type": "text",
+                  "text": {
+                    "content": " 2.1 \"Quotas\" covers the quotas.",
+                    "link": null
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": " 2.1 \"Quotas\" covers the quotas.",
+                  "href": null
+                }
+              ],
+              "color": "default"
+            }
+          },
+          {
+            "object": "block",
+            "id": "7a5b0c1d-2e3f-8000-e001-000000000104",
+            "parent": {
+              "type": "page_id",
+              "page_id": "7a5b0c1d-2e3f-8033-e003-000000000001"
+            },
+            "created_time": "2026-11-18T02:00:00.000Z",
+            "last_edited_time": "2026-11-18T02:00:00.000Z",
+            "created_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "last_edited_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "has_children": false,
+            "archived": false,
+            "in_trash": false,
+            "type": "paragraph",
+            "paragraph": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "Error codes: ",
+                    "link": null
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": "Error codes: ",
+                  "href": null
+                },
+                {
+                  "type": "mention",
+                  "mention": {
+                    "type": "page",
+                    "page": {
+                      "id": "7a5b0c1d-2e3f-8033-e003-000000000002"
+                    }
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": "Spec",
+                  "href": "https://www.notion.so/7a5b0c1d2e3f8033e003000000000002"
+                },
+                {
+                  "type": "text",
+                  "text": {
+                    "content": " 3.",
+                    "link": null
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": " 3.",
+                  "href": null
+                }
+              ],
+              "color": "default"
+            }
+          },
+          {
+            "object": "block",
+            "id": "7a5b0c1d-2e3f-8000-e001-000000000105",
+            "parent": {
+              "type": "page_id",
+              "page_id": "7a5b0c1d-2e3f-8033-e003-000000000001"
+            },
+            "created_time": "2026-11-18T02:00:00.000Z",
+            "last_edited_time": "2026-11-18T02:00:00.000Z",
+            "created_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "last_edited_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "has_children": false,
+            "archived": false,
+            "in_trash": false,
+            "type": "paragraph",
+            "paragraph": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "The history is in ",
+                    "link": null
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": "The history is in ",
+                  "href": null
+                },
+                {
+                  "type": "mention",
+                  "mention": {
+                    "type": "page",
+                    "page": {
+                      "id": "7a5b0c1d-2e3f-8033-e003-000000000002"
+                    }
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": "Spec",
+                  "href": "https://www.notion.so/7a5b0c1d2e3f8033e003000000000002"
+                },
+                {
+                  "type": "text",
+                  "text": {
+                    "content": " 4.",
+                    "link": null
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": " 4.",
+                  "href": null
+                }
+              ],
+              "color": "default"
+            }
+          },
+          {
+            "object": "block",
+            "id": "7a5b0c1d-2e3f-8000-e001-000000000106",
+            "parent": {
+              "type": "page_id",
+              "page_id": "7a5b0c1d-2e3f-8033-e003-000000000001"
+            },
+            "created_time": "2026-11-18T02:00:00.000Z",
+            "last_edited_time": "2026-11-18T02:00:00.000Z",
+            "created_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "last_edited_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "has_children": false,
+            "archived": false,
+            "in_trash": false,
+            "type": "paragraph",
+            "paragraph": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "詳しくは仕様書の3章を参照。",
+                    "link": null
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": "詳しくは仕様書の3章を参照。",
+                  "href": null
+                }
+              ],
+              "color": "default"
+            }
+          },
+          {
+            "object": "block",
+            "id": "7a5b0c1d-2e3f-8000-e001-000000000107",
+            "parent": {
+              "type": "page_id",
+              "page_id": "7a5b0c1d-2e3f-8033-e003-000000000001"
+            },
+            "created_time": "2026-11-18T02:00:00.000Z",
+            "last_edited_time": "2026-11-18T02:00:00.000Z",
+            "created_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "last_edited_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "has_children": false,
+            "archived": false,
+            "in_trash": false,
+            "type": "paragraph",
+            "paragraph": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "背景は仕様書の5章を参照。",
+                    "link": null
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": "背景は仕様書の5章を参照。",
+                  "href": null
+                }
+              ],
+              "color": "default"
+            }
+          },
+          {
+            "object": "block",
+            "id": "7a5b0c1d-2e3f-8000-e001-000000000108",
+            "parent": {
+              "type": "page_id",
+              "page_id": "7a5b0c1d-2e3f-8033-e003-000000000001"
+            },
+            "created_time": "2026-11-18T02:00:00.000Z",
+            "last_edited_time": "2026-11-18T02:00:00.000Z",
+            "created_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "last_edited_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "has_children": false,
+            "archived": false,
+            "in_trash": false,
+            "type": "paragraph",
+            "paragraph": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "See section 2 of Glossary for the terms.",
+                    "link": null
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": "See section 2 of Glossary for the terms.",
+                  "href": null
+                }
+              ],
+              "color": "default"
+            }
+          },
+          {
+            "object": "block",
+            "id": "7a5b0c1d-2e3f-8000-e001-000000000109",
+            "parent": {
+              "type": "page_id",
+              "page_id": "7a5b0c1d-2e3f-8033-e003-000000000001"
+            },
+            "created_time": "2026-11-18T02:00:00.000Z",
+            "last_edited_time": "2026-11-18T02:00:00.000Z",
+            "created_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "last_edited_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "has_children": false,
+            "archived": false,
+            "in_trash": false,
+            "type": "paragraph",
+            "paragraph": {
+              "rich_text": [
+                {
+                  "type": "mention",
+                  "mention": {
+                    "type": "page",
+                    "page": {
+                      "id": "7a5b0c1d-2e3f-8033-e003-000000000006"
+                    }
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": "History",
+                  "href": "https://www.notion.so/7a5b0c1d2e3f8033e003000000000006"
+                },
+                {
+                  "type": "text",
+                  "text": {
+                    "content": " 4.1 has the old limits.",
+                    "link": null
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": " 4.1 has the old limits.",
+                  "href": null
+                }
+              ],
+              "color": "default"
+            }
+          },
+          {
+            "object": "block",
+            "id": "7a5b0c1d-2e3f-8000-e001-000000000110",
+            "parent": {
+              "type": "page_id",
+              "page_id": "7a5b0c1d-2e3f-8033-e003-000000000001"
+            },
+            "created_time": "2026-11-18T02:00:00.000Z",
+            "last_edited_time": "2026-11-18T02:00:00.000Z",
+            "created_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "last_edited_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "has_children": false,
+            "archived": false,
+            "in_trash": false,
+            "type": "paragraph",
+            "paragraph": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "See section 7 of \"Roadmap\" and see section 1.",
+                    "link": null
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": "See section 7 of \"Roadmap\" and see section 1.",
+                  "href": null
+                }
+              ],
+              "color": "default"
+            }
+          }
+        ],
+        "next_cursor": null,
+        "has_more": false,
+        "type": "block",
+        "block": {}
+      }
+    ],
+    "GET /v1/pages/7a5b0c1d-2e3f-8033-e003-000000000002": {
+      "object": "page",
+      "id": "7a5b0c1d-2e3f-8033-e003-000000000002",
+      "created_time": "2026-11-18T02:00:00.000Z",
+      "last_edited_time": "2026-11-18T02:00:00.000Z",
+      "created_by": {
+        "object": "user",
+        "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+      },
+      "last_edited_by": {
+        "object": "user",
+        "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+      },
+      "cover": null,
+      "icon": null,
+      "parent": {
+        "type": "workspace",
+        "workspace": true
+      },
+      "archived": false,
+      "in_trash": false,
+      "is_locked": false,
+      "properties": {
+        "title": {
+          "id": "title",
+          "type": "title",
+          "title": [
+            {
+              "type": "text",
+              "text": {
+                "content": "Spec",
+                "link": null
+              },
+              "annotations": {
+                "bold": false,
+                "italic": false,
+                "strikethrough": false,
+                "underline": false,
+                "code": false,
+                "color": "default"
+              },
+              "plain_text": "Spec",
+              "href": null
+            }
+          ]
+        }
+      },
+      "url": "https://www.notion.so/Spec-7a5b0c1d2e3f8033e003000000000002",
+      "public_url": null,
+      "request_id": "req-text-extras"
+    },
+    "GET /v1/blocks/7a5b0c1d-2e3f-8033-e003-000000000002/children": [
+      {
+        "object": "list",
+        "results": [
+          {
+            "object": "block",
+            "id": "7a5b0c1d-2e3f-8000-e001-000000000201",
+            "parent": {
+              "type": "page_id",
+              "page_id": "7a5b0c1d-2e3f-8033-e003-000000000002"
+            },
+            "created_time": "2026-11-18T02:00:00.000Z",
+            "last_edited_time": "2026-11-18T02:00:00.000Z",
+            "created_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "last_edited_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "has_children": false,
+            "archived": false,
+            "in_trash": false,
+            "type": "heading_1",
+            "heading_1": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "1. Overview",
+                    "link": null
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": "1. Overview",
+                  "href": null
+                }
+              ],
+              "is_toggleable": false,
+              "color": "default"
+            }
+          },
+          {
+            "object": "block",
+            "id": "7a5b0c1d-2e3f-8000-e001-000000000202",
+            "parent": {
+              "type": "page_id",
+              "page_id": "7a5b0c1d-2e3f-8033-e003-000000000002"
+            },
+            "created_time": "2026-11-18T02:00:00.000Z",
+            "last_edited_time": "2026-11-18T02:00:00.000Z",
+            "created_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "last_edited_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "has_children": false,
+            "archived": false,
+            "in_trash": false,
+            "type": "heading_1",
+            "heading_1": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "2. Limits",
+                    "link": null
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": "2. Limits",
+                  "href": null
+                }
+              ],
+              "is_toggleable": false,
+              "color": "default"
+            }
+          },
+          {
+            "object": "block",
+            "id": "7a5b0c1d-2e3f-8000-e001-000000000203",
+            "parent": {
+              "type": "page_id",
+              "page_id": "7a5b0c1d-2e3f-8033-e003-000000000002"
+            },
+            "created_time": "2026-11-18T02:00:00.000Z",
+            "last_edited_time": "2026-11-18T02:00:00.000Z",
+            "created_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "last_edited_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "has_children": false,
+            "archived": false,
+            "in_trash": false,
+            "type": "heading_2",
+            "heading_2": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "2.1 Rate limits",
+                    "link": null
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": "2.1 Rate limits",
+                  "href": null
+                }
+              ],
+              "is_toggleable": false,
+              "color": "default"
+            }
+          },
+          {
+            "object": "block",
+            "id": "7a5b0c1d-2e3f-8000-e001-000000000204",
+            "parent": {
+              "type": "page_id",
+              "page_id": "7a5b0c1d-2e3f-8033-e003-000000000002"
+            },
+            "created_time": "2026-11-18T02:00:00.000Z",
+            "last_edited_time": "2026-11-18T02:00:00.000Z",
+            "created_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "last_edited_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "has_children": false,
+            "archived": false,
+            "in_trash": false,
+            "type": "heading_2",
+            "heading_2": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "2.2 Quotas",
+                    "link": null
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": "2.2 Quotas",
+                  "href": null
+                }
+              ],
+              "is_toggleable": false,
+              "color": "default"
+            }
+          },
+          {
+            "object": "block",
+            "id": "7a5b0c1d-2e3f-8000-e001-000000000205",
+            "parent": {
+              "type": "page_id",
+              "page_id": "7a5b0c1d-2e3f-8033-e003-000000000002"
+            },
+            "created_time": "2026-11-18T02:00:00.000Z",
+            "last_edited_time": "2026-11-18T02:00:00.000Z",
+            "created_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "last_edited_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "has_children": false,
+            "archived": false,
+            "in_trash": false,
+            "type": "heading_1",
+            "heading_1": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "3. Errors",
+                    "link": null
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": "3. Errors",
+                  "href": null
+                }
+              ],
+              "is_toggleable": false,
+              "color": "default"
+            }
+          }
+        ],
+        "next_cursor": null,
+        "has_more": false,
+        "type": "block",
+        "block": {}
+      }
+    ],
+    "GET /v1/pages/7a5b0c1d-2e3f-8033-e003-000000000003": {
+      "object": "page",
+      "id": "7a5b0c1d-2e3f-8033-e003-000000000003",
+      "created_time": "2026-11-18T02:00:00.000Z",
+      "last_edited_time": "2026-11-18T02:00:00.000Z",
+      "created_by": {
+        "object": "user",
+        "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+      },
+      "last_edited_by": {
+        "object": "user",
+        "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+      },
+      "cover": null,
+      "icon": null,
+      "parent": {
+        "type": "workspace",
+        "workspace": true
+      },
+      "archived": false,
+      "in_trash": false,
+      "is_locked": false,
+      "properties": {
+        "title": {
+          "id": "title",
+          "type": "title",
+          "title": [
+            {
+              "type": "text",
+              "text": {
+                "content": "仕様書",
+                "link": null
+              },
+              "annotations": {
+                "bold": false,
+                "italic": false,
+                "strikethrough": false,
+                "underline": false,
+                "code": false,
+                "color": "default"
+              },
+              "plain_text": "仕様書",
+              "href": null
+            }
+          ]
+        }
+      },
+      "url": "https://www.notion.so/Page-7a5b0c1d2e3f8033e003000000000003",
+      "public_url": null,
+      "request_id": "req-text-extras"
+    },
+    "GET /v1/blocks/7a5b0c1d-2e3f-8033-e003-000000000003/children": [
+      {
+        "object": "list",
+        "results": [
+          {
+            "object": "block",
+            "id": "7a5b0c1d-2e3f-8000-e001-000000000301",
+            "parent": {
+              "type": "page_id",
+              "page_id": "7a5b0c1d-2e3f-8033-e003-000000000003"
+            },
+            "created_time": "2026-11-18T02:00:00.000Z",
+            "last_edited_time": "2026-11-18T02:00:00.000Z",
+            "created_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "last_edited_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "has_children": false,
+            "archived": false,
+            "in_trash": false,
+            "type": "heading_1",
+            "heading_1": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "1. 概要",
+                    "link": null
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": "1. 概要",
+                  "href": null
+                }
+              ],
+              "is_toggleable": false,
+              "color": "default"
+            }
+          },
+          {
+            "object": "block",
+            "id": "7a5b0c1d-2e3f-8000-e001-000000000302",
+            "parent": {
+              "type": "page_id",
+              "page_id": "7a5b0c1d-2e3f-8033-e003-000000000003"
+            },
+            "created_time": "2026-11-18T02:00:00.000Z",
+            "last_edited_time": "2026-11-18T02:00:00.000Z",
+            "created_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "last_edited_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "has_children": false,
+            "archived": false,
+            "in_trash": false,
+            "type": "heading_1",
+            "heading_1": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "2. 要件",
+                    "link": null
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": "2. 要件",
+                  "href": null
+                }
+              ],
+              "is_toggleable": false,
+              "color": "default"
+            }
+          },
+          {
+            "object": "block",
+            "id": "7a5b0c1d-2e3f-8000-e001-000000000303",
+            "parent": {
+              "type": "page_id",
+              "page_id": "7a5b0c1d-2e3f-8033-e003-000000000003"
+            },
+            "created_time": "2026-11-18T02:00:00.000Z",
+            "last_edited_time": "2026-11-18T02:00:00.000Z",
+            "created_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "last_edited_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "has_children": false,
+            "archived": false,
+            "in_trash": false,
+            "type": "heading_1",
+            "heading_1": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "3. 設計",
+                    "link": null
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": "3. 設計",
+                  "href": null
+                }
+              ],
+              "is_toggleable": false,
+              "color": "default"
+            }
+          }
+        ],
+        "next_cursor": null,
+        "has_more": false,
+        "type": "block",
+        "block": {}
+      }
+    ],
+    "GET /v1/pages/7a5b0c1d-2e3f-8033-e003-000000000004": {
+      "object": "page",
+      "id": "7a5b0c1d-2e3f-8033-e003-000000000004",
+      "created_time": "2026-11-18T02:00:00.000Z",
+      "last_edited_time": "2026-11-18T02:00:00.000Z",
+      "created_by": {
+        "object": "user",
+        "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+      },
+      "last_edited_by": {
+        "object": "user",
+        "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+      },
+      "cover": null,
+      "icon": null,
+      "parent": {
+        "type": "workspace",
+        "workspace": true
+      },
+      "archived": false,
+      "in_trash": false,
+      "is_locked": false,
+      "properties": {
+        "title": {
+          "id": "title",
+          "type": "title",
+          "title": [
+            {
+              "type": "text",
+              "text": {
+                "content": "Glossary",
+                "link": null
+              },
+              "annotations": {
+                "bold": false,
+                "italic": false,
+                "strikethrough": false,
+                "underline": false,
+                "code": false,
+                "color": "default"
+              },
+              "plain_text": "Glossary",
+              "href": null
+            }
+          ]
+        }
+      },
+      "url": "https://www.notion.so/Glossary-7a5b0c1d2e3f8033e003000000000004",
+      "public_url": null,
+      "request_id": "req-text-extras"
+    },
+    "GET /v1/blocks/7a5b0c1d-2e3f-8033-e003-000000000004/children": [
+      {
+        "object": "list",
+        "results": [
+          {
+            "object": "block",
+            "id": "7a5b0c1d-2e3f-8000-e001-000000000401",
+            "parent": {
+              "type": "page_id",
+              "page_id": "7a5b0c1d-2e3f-8033-e003-000000000004"
+            },
+            "created_time": "2026-11-18T02:00:00.000Z",
+            "last_edited_time": "2026-11-18T02:00:00.000Z",
+            "created_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "last_edited_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "has_children": false,
+            "archived": false,
+            "in_trash": false,
+            "type": "heading_1",
+            "heading_1": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "1. Terms",
+                    "link": null
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": "1. Terms",
+                  "href": null
+                }
+              ],
+              "is_toggleable": false,
+              "color": "default"
+            }
+          }
+        ],
+        "next_cursor": null,
+        "has_more": false,
+        "type": "block",
+        "block": {}
+      }
+    ],
+    "GET /v1/pages/7a5b0c1d-2e3f-8033-e003-000000000005": {
+      "object": "page",
+      "id": "7a5b0c1d-2e3f-8033-e003-000000000005",
+      "created_time": "2026-11-18T02:00:00.000Z",
+      "last_edited_time": "2026-11-18T02:00:00.000Z",
+      "created_by": {
+        "object": "user",
+        "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+      },
+      "last_edited_by": {
+        "object": "user",
+        "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+      },
+      "cover": null,
+      "icon": null,
+      "parent": {
+        "type": "workspace",
+        "workspace": true
+      },
+      "archived": false,
+      "in_trash": false,
+      "is_locked": false,
+      "properties": {
+        "title": {
+          "id": "title",
+          "type": "title",
+          "title": [
+            {
+              "type": "text",
+              "text": {
+                "content": "Glossary",
+                "link": null
+              },
+              "annotations": {
+                "bold": false,
+                "italic": false,
+                "strikethrough": false,
+                "underline": false,
+                "code": false,
+                "color": "default"
+              },
+              "plain_text": "Glossary",
+              "href": null
+            }
+          ]
+        }
+      },
+      "url": "https://www.notion.so/Glossary-7a5b0c1d2e3f8033e003000000000005",
+      "public_url": null,
+      "request_id": "req-text-extras"
+    },
+    "GET /v1/blocks/7a5b0c1d-2e3f-8033-e003-000000000005/children": [
+      {
+        "object": "list",
+        "results": [
+          {
+            "object": "block",
+            "id": "7a5b0c1d-2e3f-8000-e001-000000000501",
+            "parent": {
+              "type": "page_id",
+              "page_id": "7a5b0c1d-2e3f-8033-e003-000000000005"
+            },
+            "created_time": "2026-11-18T02:00:00.000Z",
+            "last_edited_time": "2026-11-18T02:00:00.000Z",
+            "created_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "last_edited_by": {
+              "object": "user",
+              "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+            },
+            "has_children": false,
+            "archived": false,
+            "in_trash": false,
+            "type": "heading_1",
+            "heading_1": {
+              "rich_text": [
+                {
+                  "type": "text",
+                  "text": {
+                    "content": "1. Words",
+                    "link": null
+                  },
+                  "annotations": {
+                    "bold": false,
+                    "italic": false,
+                    "strikethrough": false,
+                    "underline": false,
+                    "code": false,
+                    "color": "default"
+                  },
+                  "plain_text": "1. Words",
+                  "href": null
+                }
+              ],
+              "is_toggleable": false,
+              "color": "default"
+            }
+          }
+        ],
+        "next_cursor": null,
+        "has_more": false,
+        "type": "block",
+        "block": {}
+      }
+    ],
+    "GET /v1/blocks/7a5b0c1d-2e3f-8033-e003-000000000006": {
+      "object": "block",
+      "id": "7a5b0c1d-2e3f-8033-e003-000000000006",
+      "created_time": "2026-11-18T02:00:00.000Z",
+      "last_edited_time": "2026-11-18T02:00:00.000Z",
+      "created_by": {
+        "object": "user",
+        "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+      },
+      "last_edited_by": {
+        "object": "user",
+        "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+      },
+      "parent": {
+        "type": "workspace",
+        "workspace": true
+      },
+      "archived": false,
+      "in_trash": false,
+      "has_children": true,
+      "type": "child_page",
+      "child_page": {
+        "title": "History"
+      }
+    },
+    "GET /v1/blocks/7a5b0c1d-2e3f-8033-e003-000000000002": {
+      "object": "block",
+      "id": "7a5b0c1d-2e3f-8033-e003-000000000002",
+      "created_time": "2026-11-18T02:00:00.000Z",
+      "last_edited_time": "2026-11-18T02:00:00.000Z",
+      "created_by": {
+        "object": "user",
+        "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+      },
+      "last_edited_by": {
+        "object": "user",
+        "id": "1d2e3f40-0000-4000-8000-0000000000b0"
+      },
+      "parent": {
+        "type": "workspace",
+        "workspace": true
+      },
+      "archived": false,
+      "in_trash": false,
+      "has_children": true,
+      "type": "child_page",
+      "child_page": {
+        "title": "Spec"
+      }
+    }
+  }
+}
