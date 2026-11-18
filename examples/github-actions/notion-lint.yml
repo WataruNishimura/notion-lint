@@ -1,0 +1,86 @@
+# Example: run notion-lint on a schedule with GitHub Actions.
+#
+# Copy this file to .github/workflows/notion-lint.yml in the repository that holds your
+# notion-lint config. It is kept under examples/ here so that notion-lint's own CI never runs it
+# (this repository has no Notion token).
+#
+# Exit codes of the notion-lint step, and what they do to the job:
+#   0  no violations                                  -> the job succeeds
+#   1  violations found (shown as annotations)        -> the job fails
+#   2  config error, bad arguments or Notion API error -> the job fails (message in the step log)
+# Both 1 and 2 fail the job, so GitHub's usual "workflow failed" notification covers them. To
+# keep the job green on violations, see the comment at the "Run notion-lint" step.
+
+name: notion-lint
+
+on:
+  schedule:
+    # CHANGE: cron runs in UTC. This is every weekday at 00:00 UTC (09:00 in Japan).
+    - cron: "0 0 * * 1-5"
+  # Lets you start a run by hand from the Actions tab.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      # Your repository, with the config file.
+      - name: Checkout config
+        uses: actions/checkout@v7
+
+      # CHANGE: notion-lint is not published to npm yet, so it is built from source.
+      # Pin `ref` to a tag or commit you have tested. Once it is on npm, replace this step and the
+      # build with `npm install --global notion-lint` and run `notion-lint` directly.
+      - name: Checkout notion-lint
+        uses: actions/checkout@v7
+        with:
+          repository: WataruNishimura/notion-lint
+          ref: main
+          path: .notion-lint
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          package_json_file: .notion-lint/package.json
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: .notion-lint/pnpm-lock.yaml
+
+      - name: Install and build notion-lint
+        working-directory: .notion-lint
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+
+      - name: Run notion-lint
+        env:
+          # The token of an integration connected to the pages. Create the secret in
+          # Settings > Secrets and variables > Actions. Never write the token in this file.
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: |
+          # `bash -e` would stop at exit code 1 before the summary step below, so handle it here.
+          set +e
+          # CHANGE: the path of your config file (see notion-lint.config.json next to this file). --format github makes violations annotations.
+          node .notion-lint/dist/cli.js check --config notion-lint.config.json --format github | tee notion-lint.log
+          code=${PIPESTATUS[0]}
+          set -e
+
+          # Optional: a one-line result on the run's summary page.
+          {
+            echo "### notion-lint"
+            echo
+            tail -n 1 notion-lint.log
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          # Pass the exit code on: 1 (violations) and 2 (error) both fail the job.
+          # To keep the job green when there are only violations (annotations still appear), use:
+          #   if [ "$code" -eq 1 ]; then exit 0; fi
+          exit "$code"

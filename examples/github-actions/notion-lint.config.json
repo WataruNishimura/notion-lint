@@ -1,0 +1,21 @@
+{
+  "targets": [
+    {
+      "dataSource": "00000000-0000-0000-0000-000000000000",
+      "where": { "Type": "Weekly" },
+      "type": {
+        "name": "Meeting notes",
+        "properties": {
+          "Date": { "type": "date", "required": true },
+          "Attendees": { "type": "people", "min": 1 }
+        },
+        "body": [
+          { "heading": 2, "title": "Purpose" },
+          { "heading": 2, "title": "Decisions", "children": [{ "block": "list", "min": 1 }] },
+          { "heading": 2, "title": "TODO", "children": [{ "block": "to_do" }] }
+        ],
+        "headings": { "noSkipLevel": true }
+      }
+    }
+  ]
+}

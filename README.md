@@ -137,6 +137,15 @@ notion-lint --config-json '{"type":{...}}' --page <URL or ID>  # JSON in an argu
 
 Exit codes: 0 means no violations, 1 means violations were found, and 2 means a config error, invalid arguments, or a Notion API error.
 
+## Scheduled runs on GitHub Actions
+
+[examples/github-actions/notion-lint.yml](examples/github-actions/notion-lint.yml) is a workflow that runs `notion-lint check --format github` on a `schedule` (cron) and on `workflow_dispatch`, with [a small config](examples/github-actions/notion-lint.config.json). Copy it to `.github/workflows/` in the repository that holds your config, and change the parts marked `CHANGE` (cron time, notion-lint version, config path).
+
+- Create the repository secret `NOTION_TOKEN`. The workflow passes it as an environment variable; never write it in a file.
+- With `--format github`, each violation is an annotation (`::error` or `::warning`) that ends with a Notion link: the block when the violation has one, otherwise the page. The workflow also writes the one-line result to the run's summary page.
+- Exit code 0 passes the job. Exit code 1 (violations) and 2 (config error, invalid arguments, or Notion API error) both fail it, so GitHub's usual failed-workflow notification reports both. Violations appear as annotations; exit code 2 prints its message in the step log. A comment in the workflow shows how to keep the job green when there are only violations.
+- The example sits under `examples/`, so this repository's own CI does not run it (it has no Notion token). Its syntax was checked with actionlint.
+
 ## Config file
 
 ```ts

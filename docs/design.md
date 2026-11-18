@@ -222,7 +222,7 @@ Notion headings have no automatic section numbers, so the numbers are assumed to
 7. textlint integration
 8. `doc.fromTemplate`
 9. `notion-lint agent` (detecting and appending to instruction files)
-10. Example of scheduled runs on GitHub Actions
+10. Example of scheduled runs on GitHub Actions: [examples/github-actions/notion-lint.yml](../examples/github-actions/notion-lint.yml) (schedule + `workflow_dispatch`, `NOTION_TOKEN` from a secret, explicit `--config`, `--format github`). Every `--format github` annotation ends with a Notion link, the block's or, failing that, the page's. The workflow builds notion-lint from source because it is not published to npm.
 
 ## Notes
 
