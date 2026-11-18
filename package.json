@@ -1,9 +1,26 @@
 {
   "name": "notion-lint",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A CLI that checks whether Notion pages match the document types written in your config",
-  "license": "UNLICENSED",
-  "private": true,
+  "license": "MIT",
+  "author": "Wataru Nishimura",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WataruNishimura/notion-lint.git"
+  },
+  "homepage": "https://github.com/WataruNishimura/notion-lint#readme",
+  "bugs": {
+    "url": "https://github.com/WataruNishimura/notion-lint/issues"
+  },
+  "keywords": [
+    "notion",
+    "lint",
+    "linter",
+    "textlint",
+    "documentation",
+    "cli",
+    "github-actions"
+  ],
   "type": "module",
   "engines": {
     "node": ">=22"
@@ -22,10 +39,16 @@
   },
   "files": [
     "dist",
-    "schema"
+    "schema",
+    "CHANGELOG.md"
   ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
+    "prepack": "npm run build",
     "dev": "tsx src/cli.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",

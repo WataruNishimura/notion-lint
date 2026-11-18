@@ -101,7 +101,7 @@ A type passed as JSON is never executed as code. Only TS config files are execut
 - `notion-lint schema`: prints the JSON Schema of the config. Agents read it to assemble a type.
 - `--format json`: for each violation, gives the page ID, the block ID, where it corresponds in the type (`body[1]`, `properties.attendees`, etc.), the message, and structured fix suggestions.
 - `--page <URL or ID>`: ignores the `targets` in the config file and checks only the page specified on the spot.
-- Exit codes: 0 means no violations, 1 means violations were found, and 2 means a config error or API error. Even config errors are returned as JSON, showing which fields do not match the schema.
+- Exit codes: 0 means no violations, 1 means violations were found, and 2 means a config error or API error. Even config errors are returned as JSON, showing which fields do not match the schema. With `--format github`, errors are written as an `::error` annotation instead.
 
 **Example**
 
@@ -148,7 +148,7 @@ config load → fetch (Notion API) → normalize (internal representation) → m
 | fetch | `@notionhq/client`. Collects target pages by page ID, or by data source plus conditions (`where` becomes a query filter built from the data source schema where possible; the rest is checked locally). Formula and rollup conditions are translated from what a few sample pages show the property yields (the schema does not say), and files as empty / not empty. A `dataSource` that is a database ID or URL is resolved to its only data source. Reads long people / files / relation / title / rich_text values in full through the page property endpoint. Recursively fetches child blocks, and handles pagination and rate limits (about 3 requests/s on average) |
 | normalize | Converts API JSON into a block tree (headings, paragraphs, lists, etc.) and a dictionary of properties. The matching code never looks at the raw API shape |
 | validate | Properties are checked item by item. The body is matched in order by aligning the "skeleton of the type" with "the heading tree of the page" (extra headings follow `allowExtra`). Body text is converted to Markdown and passed to textlint |
-| report | Human-readable format, JSON, and GitHub Actions annotations |
+| report | Human-readable format, JSON, and GitHub Actions annotations. With `--format github`, errors (exit code 2) are annotations too: `::error title=notion-lint error` with the message and the mismatched config fields, `file=` set when the error is about a config file (not stdin or `--config-json`), and the page or data source in the message when the error is about one. They go to standard output, where the runner reads them; the text format keeps writing errors to standard error and `--format json` to standard output as JSON |
 
 ## How the body is matched
 
@@ -223,7 +223,8 @@ Notion headings have no automatic section numbers, so the numbers are assumed to
 7. textlint integration
 8. `doc.fromTemplate`
 9. `notion-lint agent` (detecting and appending to instruction files)
-10. Example of scheduled runs on GitHub Actions: [examples/github-actions/notion-lint.yml](../examples/github-actions/notion-lint.yml) (schedule + `workflow_dispatch`, `NOTION_TOKEN` from a secret, explicit `--config`, `--format github`). Every `--format github` annotation ends with a Notion link, the block's or, failing that, the page's. The workflow builds notion-lint from source because it is not published to npm.
+10. Example of scheduled runs on GitHub Actions: [examples/github-actions/notion-lint.yml](../examples/github-actions/notion-lint.yml) (schedule + `workflow_dispatch`, `NOTION_TOKEN` from a secret, explicit `--config`, `--format github`). Every `--format github` annotation ends with a Notion link, the block's or, failing that, the page's. The workflow builds notion-lint from source because it was written before the first npm release; its comments show how to switch to `npx notion-lint@<version>` after it.
+11. Release preparation: the package is published to npm as `notion-lint` (MIT, version 0.1.0 for the first release). `files` ships `dist/` and `schema/` (the textlint presets and prh are dependencies and are resolved from notion-lint's own `node_modules`; `package.json` is read at runtime for the version), plus README, LICENSE, CHANGELOG, and package.json, which npm always adds. `prepack` builds, so `npm pack` works from a fresh clone, and `test/package.test.ts` checks the tarball contents and that the built CLI starts. [.github/workflows/release.yml](../.github/workflows/release.yml) runs on pushed `v*` tags only: `pnpm check`, `pnpm build`, a check that the tag equals the `package.json` version, then `npm publish --provenance --access public` with `NPM_TOKEN`, and a GitHub release from the CHANGELOG section. The maintainer's steps are in [releasing.md](releasing.md).
 
 ## Notes
 
@@ -237,4 +238,3 @@ Notion headings have no automatic section numbers, so the numbers are assumed to
 - Which Notion workspace, which databases, and which concrete document types to check
 - How section numbers and references are actually written (e.g. "Chapter 3", "3.", "3-1"). Decide the initial values of `format` and `patterns` by looking at existing documents
 - Whether to automate fixes or post comments on pages (the first release is assumed to be check-only)
-- Whether to publish as an npm package, or keep it as a personal tool

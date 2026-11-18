@@ -1,7 +1,8 @@
-import type { CheckResult, Violation } from "../schema/result.js";
+import type { CheckResult, ErrorResult, Violation } from "../schema/result.js";
 
 /**
- * Output of a finished check (exit code 0 or 1). Errors (exit code 2) are written by run.ts.
+ * Output of a finished check (exit code 0 or 1), and `formatErrorGithub` for errors (exit code 2).
+ * The other error formats are written by run.ts.
  */
 
 export function formatJson(result: CheckResult): string {
@@ -104,4 +105,29 @@ export function formatGithub(result: CheckResult): string {
     `notion-lint: ${plural(summary.pages, "page")} checked, ${plural(summary.violations, "problem")}`,
   );
   return `${lines.join("\n")}\n`;
+}
+
+/**
+ * An error (exit code 2) as a GitHub Actions annotation, so it shows on the run's page and not
+ * only in the step log. The message names the page or data source when the error is about one.
+ * `file=` is set only when the error is about a config file (not stdin or `--config-json`).
+ */
+export function formatErrorGithub(result: ErrorResult): string {
+  const { error } = result;
+  const lines = [error.message];
+  for (const issue of error.issues ?? []) {
+    lines.push(`  ✖ ${issue.path === "" ? "(root)" : issue.path}  ${issue.message}`);
+  }
+  const isFile =
+    error.kind === "config" &&
+    error.source !== undefined &&
+    error.source !== "stdin" &&
+    error.source !== "--config-json";
+  const file = isFile ? `file=${escapeProperty(error.source ?? "")},` : "";
+  const title = escapeProperty("notion-lint error");
+  return [
+    `::error ${file}title=${title}::${escapeData(lines.join("\n"))}`,
+    `notion-lint: stopped by a ${error.kind} error (exit code 2)`,
+    "",
+  ].join("\n");
 }
