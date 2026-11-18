@@ -356,11 +356,15 @@ export const Target = KeyedUnion(
   [
     Type.Object(
       {
-        dataSource: Type.String({ minLength: 1, description: "Data source ID or URL" }),
+        dataSource: Type.String({
+          minLength: 1,
+          description:
+            "Data source ID or URL. A database ID or URL also works when the database has one data source; with several, the error lists their IDs",
+        }),
         where: Type.Optional(
           Type.Record(Type.String({ minLength: 1 }), WhereValue, {
             description:
-              "Property names and values. Only pages where all of them match are checked",
+              "Property names and values. Only pages where all of them match are checked. A formula is compared as its result (number, true / false, text, or date), a rollup as a number, a date, or an array in which some item must equal the value, and files by true (has files), false (no files), or a file name",
           }),
         ),
         type: RefTo(DocType),

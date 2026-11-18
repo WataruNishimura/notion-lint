@@ -17,6 +17,13 @@ export interface PageFetcher {
   page(pageId: string): Promise<Record<string, unknown>>;
   /** The data source object (its `properties` hold the schema). Fetched once per data source. */
   dataSource(dataSourceId: string): Promise<Record<string, unknown>>;
+  /** The database object (its `data_sources` list the IDs and names). Not cached; see `resolveDataSource`. */
+  database(databaseId: string): Promise<Record<string, unknown>>;
+  /**
+   * A few pages of a data source (one request), to see what its formula and rollup properties
+   * yield. Fetched once per data source.
+   */
+  dataSourceSample(dataSourceId: string): Promise<Record<string, unknown>[]>;
   /**
    * The pages of a data source (all result pages of the query), narrowed by `filter` when
    * given. Page objects truncate long property lists; see `propertyItems`.
@@ -69,6 +76,8 @@ export interface FetcherOptions {
 const OTHER_PAGES = new Set(["child_page", "child_database"]);
 
 const PAGE_SIZE = 100;
+/** Pages read to see what a formula or rollup yields (one request). */
+const SAMPLE_SIZE = 10;
 
 const defaultSleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
@@ -82,6 +91,7 @@ export class NotionFetcher implements PageFetcher {
   readonly #sleep: (ms: number) => Promise<void>;
   #nextStart = Number.NEGATIVE_INFINITY;
   readonly #dataSources = new Map<string, Promise<Record<string, unknown>>>();
+  readonly #samples = new Map<string, Promise<Record<string, unknown>[]>>();
 
   constructor(api: NotionApi, options: FetcherOptions = {}) {
     this.#api = api;
@@ -111,6 +121,25 @@ export class NotionFetcher implements PageFetcher {
       schema.catch(() => this.#dataSources.delete(dataSourceId));
     }
     return schema;
+  }
+
+  async database(databaseId: string): Promise<Record<string, unknown>> {
+    const database = await this.#request(`database ${databaseId}`, () =>
+      this.#api.retrieveDatabase({ database_id: databaseId }),
+    );
+    return asRecord(database);
+  }
+
+  dataSourceSample(dataSourceId: string): Promise<Record<string, unknown>[]> {
+    let sample = this.#samples.get(dataSourceId);
+    if (sample === undefined) {
+      sample = this.#request(`data source ${dataSourceId}`, () =>
+        this.#api.queryDataSource({ data_source_id: dataSourceId, page_size: SAMPLE_SIZE }),
+      ).then((response) => response.results.map(asRecord).filter((item) => item.object === "page"));
+      this.#samples.set(dataSourceId, sample);
+      sample.catch(() => this.#samples.delete(dataSourceId));
+    }
+    return sample;
   }
 
   async dataSourcePages(

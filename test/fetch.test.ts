@@ -51,6 +51,7 @@ describe("NotionFetcher", () => {
       retrievePage: unused,
       retrieveBlock: unused,
       retrieveDataSource: unused,
+      retrieveDatabase: unused,
       retrievePropertyItem: unused,
       queryDataSource: unused,
       listBlockChildren: async ({ start_cursor, page_size }) => {
@@ -82,6 +83,7 @@ describe("NotionFetcher", () => {
       retrievePage: unused,
       retrieveBlock: unused,
       retrieveDataSource: unused,
+      retrieveDatabase: unused,
       retrievePropertyItem: unused,
       queryDataSource: unused,
       listBlockChildren: async ({ block_id }) => {
@@ -99,6 +101,7 @@ describe("NotionFetcher", () => {
       retrievePage: unused,
       retrieveBlock: unused,
       retrieveDataSource: unused,
+      retrieveDatabase: unused,
       retrievePropertyItem: unused,
       listBlockChildren: unused,
       queryDataSource: async ({ start_cursor }) =>
@@ -124,6 +127,7 @@ describe("NotionFetcher", () => {
       queryDataSource: unused,
       retrieveBlock: unused,
       retrieveDataSource: unused,
+      retrieveDatabase: unused,
       retrievePropertyItem: unused,
       retrievePage: async () => {
         calls++;
@@ -145,6 +149,7 @@ describe("NotionFetcher", () => {
       queryDataSource: unused,
       retrieveBlock: unused,
       retrieveDataSource: unused,
+      retrieveDatabase: unused,
       retrievePropertyItem: unused,
       retrievePage: async () => {
         calls++;
@@ -171,6 +176,7 @@ describe("NotionFetcher", () => {
       queryDataSource: unused,
       retrieveBlock: unused,
       retrieveDataSource: unused,
+      retrieveDatabase: unused,
       retrievePropertyItem: unused,
       retrievePage: async () => {
         calls++;
@@ -193,6 +199,7 @@ describe("NotionFetcher", () => {
       queryDataSource: unused,
       retrieveBlock: unused,
       retrieveDataSource: unused,
+      retrieveDatabase: unused,
       retrievePropertyItem: unused,
       retrievePage: async ({ page_id }) => ({ object: "page", id: page_id }),
     };

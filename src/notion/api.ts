@@ -42,6 +42,8 @@ export interface NotionApi {
   }): Promise<ListResponse>;
   /** `GET /v1/data_sources/{data_source_id}` (the schema: property names and types) */
   retrieveDataSource(args: { data_source_id: string }): Promise<unknown>;
+  /** `GET /v1/databases/{database_id}` (its `data_sources` list the data source IDs and names) */
+  retrieveDatabase(args: { database_id: string }): Promise<unknown>;
   /**
    * `GET /v1/pages/{page_id}/properties/{property_id}`. For list-valued properties (title,
    * rich_text, people, files, relation) the response is a list of property items.
@@ -76,6 +78,7 @@ export function createNotionApi(token: string): NotionApi {
         args as Parameters<typeof client.dataSources.query>[0],
       ) as unknown as Promise<ListResponse>,
     retrieveDataSource: (args) => client.dataSources.retrieve(args),
+    retrieveDatabase: (args) => client.databases.retrieve(args),
     retrievePropertyItem: (args) => client.pages.properties.retrieve(args),
   };
 }
