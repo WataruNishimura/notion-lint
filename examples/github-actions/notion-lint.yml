@@ -32,9 +32,17 @@ jobs:
       - name: Checkout config
         uses: actions/checkout@v7
 
-      # CHANGE: notion-lint is not published to npm yet, so it is built from source.
-      # Pin `ref` to a tag or commit you have tested. Once it is on npm, replace this step and the
-      # build with `npm install --global notion-lint` and run `notion-lint` directly.
+      # CHANGE: this example builds notion-lint from source, which works before the first npm
+      # release (0.1.0). Pin `ref` to a tag or commit you have tested.
+      #
+      # After notion-lint is published to npm, you can drop this step, the pnpm and "Install and
+      # build" steps below, and the `cache` lines of setup-node. Keep "Set up Node.js" with
+      # `node-version: 22` (without `cache`), and run the published package instead (see the
+      # comment at the "Run notion-lint" step):
+      #   npx --yes notion-lint@0.1.0 check --config notion-lint.config.json --format github
+      # or, with pnpm:
+      #   pnpm dlx notion-lint@0.1.0 check --config notion-lint.config.json --format github
+      # Pin an exact version so that a new release cannot change your results unexpectedly.
       - name: Checkout notion-lint
         uses: actions/checkout@v7
         with:
@@ -68,6 +76,8 @@ jobs:
         run: |
           # `bash -e` would stop at exit code 1 before the summary step below, so handle it here.
           set +e
+          # After the first release, replace the next command with the published package:
+          #   npx --yes notion-lint@0.1.0 check --config notion-lint.config.json --format github | tee notion-lint.log
           # CHANGE: the path of your config file (see notion-lint.config.json next to this file). --format github makes violations annotations.
           node .notion-lint/dist/cli.js check --config notion-lint.config.json --format github | tee notion-lint.log
           code=${PIPESTATUS[0]}
