@@ -81,14 +81,14 @@ function checkValue(spec: PropSpec, value: PropertyValue, empty: boolean, add: A
     case "multi_select": {
       if (value.type !== "multi_select") return;
       checkOptions(spec.options, value.values, add);
-      checkCount(spec, value.values.length, false, "option", add);
+      checkCount(spec, value.values.length, "option", add);
       return;
     }
     case "people":
     case "files":
     case "relation": {
       if (value.type !== spec.type) return;
-      checkCount(spec, value.count, value.hasMore, UNITS[spec.type], add);
+      checkCount(spec, value.count, UNITS[spec.type], add);
       return;
     }
     case "date":
@@ -104,19 +104,12 @@ function plural(n: number, unit: string): string {
   return `${n} ${unit === "person" ? "people" : `${unit}s`}`;
 }
 
-function checkCount(
-  spec: { min?: number; max?: number },
-  count: number,
-  hasMore: boolean,
-  unit: string,
-  add: Add,
-): void {
-  const found = hasMore ? `${count} or more found` : `${count} found`;
-  if (spec.min !== undefined && count < spec.min && !hasMore) {
-    add("min", `needs at least ${plural(spec.min, unit)} (${found})`);
+function checkCount(spec: { min?: number; max?: number }, count: number, unit: string, add: Add) {
+  if (spec.min !== undefined && count < spec.min) {
+    add("min", `needs at least ${plural(spec.min, unit)} (${count} found)`);
   }
   if (spec.max !== undefined && count > spec.max) {
-    add("max", `allows at most ${plural(spec.max, unit)} (${found})`);
+    add("max", `allows at most ${plural(spec.max, unit)} (${count} found)`);
   }
 }
 
@@ -151,7 +144,7 @@ function isEmpty(value: PropertyValue): boolean {
     case "people":
     case "files":
     case "relation":
-      return value.count === 0 && !value.hasMore;
+      return value.count === 0;
     case "checkbox":
       return !value.checked;
     case "unsupported":

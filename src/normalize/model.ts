@@ -25,8 +25,13 @@ export type PropertyValue =
   | { type: "select" | "status"; value: string | null }
   | { type: "multi_select"; values: string[] }
   | { type: "date"; start: string | null; end: string | null }
-  /** `hasMore`: the API truncated the list (more than 25 items), so `count` is a lower bound. */
-  | { type: CountPropertyType; count: number; hasMore: boolean }
+  /**
+   * `ids` (people and relation only) are the user / page IDs, hyphenated. `hasMore` is true
+   * only for a page object whose list may be cut short (see `src/notion/long-values.ts`): it
+   * holds 25 items at most, so `count` and `ids` are partial. `check` completes pages before
+   * matching them.
+   */
+  | { type: CountPropertyType; count: number; hasMore: boolean; ids?: string[] }
   | { type: "checkbox"; checked: boolean }
   /** Property types that types cannot describe (formula, rollup, created_time, ...). */
   | { type: "unsupported"; apiType: string };

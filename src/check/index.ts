@@ -1,7 +1,9 @@
 import { normalizePage } from "../normalize/index.js";
 import type { BodyItem, PageModel, PropertyValue } from "../normalize/model.js";
 import { NotionApiError, type PageFetcher } from "../notion/fetch.js";
+import { buildFilter, propertyTypes } from "../notion/filter.js";
 import { parseNotionId } from "../notion/id.js";
+import { withFullProperties } from "../notion/long-values.js";
 import { joinPath } from "../path.js";
 import type { Config, DocType } from "../schema/config.js";
 import type {
@@ -121,10 +123,16 @@ export async function runCheck(
     const rawPages =
       plan.kind === "page"
         ? [await fetcher.page(plan.pageId)]
-        : (await fetcher.dataSourcePages(plan.dataSourceId)).filter((raw) =>
-            whereMatches(normalizePage(raw), plan.where, plan.wherePath),
-          );
-    for (const raw of rawPages) {
+        : await dataSourcePages(plan, fetcher);
+    // Property lists the type or `where` looks at are read in full (page objects stop at 25).
+    const listed = [...Object.keys(plan.type.properties ?? {})];
+    if (plan.kind === "dataSource") listed.push(...Object.keys(plan.where ?? {}));
+    for (const listedRaw of rawPages) {
+      const raw = await withFullProperties(listedRaw, listed, fetcher);
+      // `where` again on the full values: the first pass keeps a page whose list was cut short.
+      if (plan.kind === "dataSource" && raw !== listedRaw) {
+        if (!whereMatches(normalizePage(raw), plan.where, plan.wherePath)) continue;
+      }
       const id = typeof raw.id === "string" ? raw.id : "";
       const blocks = needsBody(plan.type) ? await fetcher.blocks(id) : [];
       const page = normalizePage(raw, blocks);
@@ -253,6 +261,29 @@ function pageResult(page: PageModel, type: DocType, findings: Finding[]): PageRe
 }
 
 /**
+ * The pages of a data source target. `where` is sent to Notion as a query filter as far as
+ * the data source's schema allows. The filter only narrows the query: every condition is
+ * also checked here on the pages that come back, so the result does not depend on it.
+ */
+async function dataSourcePages(
+  plan: Extract<Plan, { kind: "dataSource" }>,
+  fetcher: PageFetcher,
+): Promise<Record<string, unknown>[]> {
+  let filter: Record<string, unknown> | undefined;
+  if (Object.keys(plan.where ?? {}).length > 0) {
+    try {
+      filter = buildFilter(propertyTypes(await fetcher.dataSource(plan.dataSourceId)), plan.where);
+    } catch (error) {
+      // Without a schema, query everything and filter here. A real access problem shows up
+      // again as the query's own error.
+      if (!(error instanceof NotionApiError)) throw error;
+    }
+  }
+  const pages = await fetcher.dataSourcePages(plan.dataSourceId, filter);
+  return pages.filter((raw) => whereMatches(normalizePage(raw), plan.where, plan.wherePath));
+}
+
+/**
  * `where` of a data source target, compared with the page's property values. Throws a
  * config error for a property the data source does not have, or one `where` cannot compare.
  */
@@ -302,6 +333,13 @@ function compare(value: PropertyValue, expected: string | number | boolean): boo
       return value.checked === (expected === true || expected === "true");
     case "date":
       return value.start === text;
+    case "people":
+    case "relation": {
+      const id = parseNotionId(text);
+      if (id === undefined) return undefined;
+      // A cut-short list may hold the ID beyond its 25 items; keep the page until it is complete.
+      return (value.ids ?? []).includes(id) || value.hasMore;
+    }
     default:
       return undefined;
   }
